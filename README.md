@@ -64,7 +64,7 @@ A modern web application built with React, TypeScript, and Supabase to help user
    ```
    npm install
    ```
-3. Create a `.env` file in the root directory with your Supabase credentials:
+3. Create a `.env` file in the root directory with your Supabase credentials (use the values provided to you by your team and never commit this file to version control):
    ```
    REACT_APP_SUPABASE_URL=your_supabase_url
    REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -74,17 +74,10 @@ A modern web application built with React, TypeScript, and Supabase to help user
 
 1. Create a new Supabase project
 2. Enable Email authentication in the Authentication settings
-3. Create a new table called `jobs` with the following columns:
-   - `id`: uuid (primary key)
-   - `user_id`: uuid (foreign key to auth.users)
-   - `company`: text
-   - `role`: text
-   - `date_applied`: date
-   - `location`: text
-   - `link`: text
-   - `status`: text
-   - `created_at`: timestamp
-4. Set up Row Level Security (RLS) policies to ensure users can only access their own data
+3. Open the SQL editor in your Supabase dashboard
+4. Copy and paste the entire contents of the `migration.sql` file in this project into the SQL editor
+5. Run the SQL script to create all necessary tables, indexes, triggers, and RLS policies
+6. All database tables will be created with proper Row Level Security (RLS) policies to ensure users can only access their own data
 
 ### Running the Application
 
