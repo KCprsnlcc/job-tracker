@@ -4,9 +4,19 @@ import { getJobs, deleteJob } from '../services/jobService';
 import { Job, SortField, SortDirection } from '../types';
 import JobForm from '../components/JobForm';
 import JobTable from '../components/JobTable';
+import DeleteConfirmation from '../components/DeleteConfirmation';
+import { ThemeToggle } from '../components/theme-toggle';
+import { Search, Plus, LogOut } from 'lucide-react';
+import { useToast } from '../hooks/use-toast';
+
+// Import shadcn components
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Card } from '../components/ui/card';
 
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { toast } = useToast();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,6 +25,8 @@ const Dashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField>('date_applied');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [jobToDelete, setJobToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -48,16 +60,35 @@ const Dashboard: React.FC = () => {
     setIsFormOpen(true);
   };
 
+  const openDeleteDialog = (jobId: string) => {
+    setJobToDelete(jobId);
+    setDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setJobToDelete(null);
+  };
+
   const handleDeleteJob = async (jobId: string) => {
-    if (!window.confirm('Are you sure you want to delete this job application?')) {
-      return;
-    }
+    openDeleteDialog(jobId);
+  };
+
+  const confirmDeleteJob = async () => {
+    if (!jobToDelete) return;
     
     try {
-      await deleteJob(jobId);
-      setJobs(jobs.filter(job => job.id !== jobId));
+      await deleteJob(jobToDelete);
+      setJobs(jobs.filter(job => job.id !== jobToDelete));
+      closeDeleteDialog();
+      toast({
+        title: 'Job Deleted',
+        description: 'Your job application has been deleted.',
+        variant: 'destructive',
+      });
     } catch (err: any) {
       setError(err.message || 'Failed to delete job');
+      closeDeleteDialog();
     }
   };
 
@@ -70,6 +101,11 @@ const Dashboard: React.FC = () => {
     setIsFormOpen(false);
     setCurrentJob(null);
     fetchJobs();
+    toast({
+      title: currentJob ? 'Job Updated' : 'Job Added',
+      description: currentJob ? 'Your job application has been updated.' : 'Your job application has been added.',
+      variant: 'default',
+    });
   };
 
   const handleSort = (field: SortField) => {
@@ -110,18 +146,22 @@ const Dashboard: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
+    <div className="min-h-screen bg-background">
+      <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Job Tracker</h1>
+          <h1 className="text-2xl font-bold">Job Tracker</h1>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">{user?.email}</span>
-            <button
+            <span className="text-sm text-muted-foreground">{user?.email}</span>
+            <ThemeToggle />
+            <Button 
+              variant="ghost" 
+              size="sm" 
               onClick={() => signOut()}
-              className="px-3 py-1 rounded-md text-sm text-gray-700 hover:bg-gray-100"
+              className="flex items-center gap-1"
             >
-              Sign Out
-            </button>
+              <LogOut className="h-4 w-4" />
+              <span>Sign Out</span>
+            </Button>
           </div>
         </div>
       </header>
@@ -129,59 +169,53 @@ const Dashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">Your Job Applications</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-xl font-semibold">Your Job Applications</h2>
+            <p className="text-sm text-muted-foreground mt-1">
               {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'} found
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
             <div className="relative">
-              <input
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
                 type="text"
                 placeholder="Search jobs..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="pl-8 w-full sm:w-[200px] lg:w-[300px]"
                 value={searchTerm}
                 onChange={handleSearch}
               />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                </svg>
-              </div>
             </div>
 
-            <button
+            <Button
               onClick={handleAddJob}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="flex items-center gap-1"
             >
-              <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Add Job
-            </button>
+              <Plus className="h-4 w-4" />
+              <span>Add Job</span>
+            </Button>
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 p-4 rounded-md mb-6">
+          <Card className="bg-destructive/10 border-destructive p-4 mb-6">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                <div className="mt-1 text-sm text-red-700">{error}</div>
+                <h3 className="text-sm font-medium text-destructive">Error</h3>
+                <div className="mt-1 text-sm text-destructive/90">{error}</div>
               </div>
             </div>
-          </div>
+          </Card>
         )}
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
           </div>
         ) : (
           <JobTable
@@ -200,6 +234,12 @@ const Dashboard: React.FC = () => {
         onClose={handleFormClose}
         job={currentJob}
         onSuccess={handleFormSuccess}
+      />
+
+      <DeleteConfirmation
+        isOpen={deleteDialogOpen}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDeleteJob}
       />
     </div>
   );
