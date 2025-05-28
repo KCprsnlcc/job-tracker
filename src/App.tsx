@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import LandingPage from './pages/LandingPage';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
@@ -22,8 +23,8 @@ function App() {
                 <Dashboard />
               </ProtectedRoute>
             } />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           {/* Toast notifications */}
           <Toaster />
