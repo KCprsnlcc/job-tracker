@@ -11,6 +11,7 @@ import Analytics from './pages/Analytics';
 import TaskManager from './pages/TaskManager';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/toaster';
+import NavigationHandler from './components/NavigationHandler';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
     <ThemeProvider defaultTheme="system" storageKey="job-tracker-theme">
       <AuthProvider>
         <Router>
+          <NavigationHandler />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />

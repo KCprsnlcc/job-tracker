@@ -220,7 +220,10 @@ const Dashboard: React.FC = () => {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => signOut()}
+                onClick={() => {
+                  console.log('Dashboard: Sign out button clicked');
+                  signOut();
+                }}
                 className="flex items-center gap-1 relative overflow-hidden"
               >
                 <LogOut className="h-4 w-4" />

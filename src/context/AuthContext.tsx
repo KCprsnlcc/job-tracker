@@ -44,6 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event: string, session: Session | null) => {
+        console.log('AuthContext: onAuthStateChange triggered. Event:', _event, 'Session:', session);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -85,7 +86,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    console.log('AuthContext: signOut method called');
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('AuthContext: Supabase signout error:', error);
+      } else {
+        console.log('AuthContext: Supabase signout successful, auth state should change.');
+      }
+    } catch (e) {
+      console.error('AuthContext: Error during signOut process:', e);
+    }
   };
 
   const resendVerificationEmail = async (email: string) => {
