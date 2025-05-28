@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Job, JobFormData } from '../types';
+import { Job, JobFormData, JobStatus } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { createJob, updateJob } from '../services/jobService';
 import { useForm } from 'react-hook-form';
@@ -19,7 +19,7 @@ interface JobFormProps {
   onSuccess: () => void;
 }
 
-const statusOptions = [
+const statusOptions: JobStatus[] = [
   'Applied',
   'Interview',
   'Offer',
@@ -31,9 +31,9 @@ const JobForm: React.FC<JobFormProps> = ({ isOpen, onClose, job, onSuccess }) =>
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState(job?.status || 'Applied');
+  const [status, setStatus] = useState<JobStatus>(job?.status as JobStatus || 'Applied');
   
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<JobFormData>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<JobFormData>({
     defaultValues: {
       company: '',
       role: '',
@@ -184,7 +184,7 @@ const JobForm: React.FC<JobFormProps> = ({ isOpen, onClose, job, onSuccess }) =>
             <Label htmlFor="status" className="text-sm">
               Status *
             </Label>
-            <Select defaultValue={status} onValueChange={(value) => setStatus(value)}>
+            <Select defaultValue={status} onValueChange={(value: string) => setStatus(value as JobStatus)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
