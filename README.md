@@ -1,6 +1,11 @@
 # Job Tracker Application
 
-A web application built with React, TypeScript, and Supabase to help users manage their job applications. Users can track job applications with details like company, role, date applied, location, link, and status.
+A modern web application built with React, TypeScript, and Supabase to help users manage their job search journey. Users can track job applications, manage related tasks, and view insightful analytics to optimize their job search strategy.
+
+## Screenshot Preview
+
+![Job Tracker Dashboard Preview](./public/dashboard-preview.png)
+*Dashboard view of the Job Tracker application*
 
 ## Features
 
@@ -13,17 +18,31 @@ A web application built with React, TypeScript, and Supabase to help users manag
   - Track essential job information (company, role, date applied, location, link, status)
   - Sort and filter job applications
 
+- **Task Management**
+  - Create and manage job search-related tasks with due dates
+  - Track task status (pending, completed)
+  - Filter tasks by status, due date, and more
+  - Get alerts for overdue tasks
+
+- **Analytics Dashboard**
+  - Visual representation of application status distribution
+  - Job search insights and trends
+  - Response rate tracking
+  - Average response time metrics
+
 - **Modern UI**
-  - Clean, responsive interface built with Tailwind CSS
-  - Modal forms for adding and editing job entries
+  - Sleek, responsive interface built with Tailwind CSS and shadcn/ui components
+  - Dark/light theme toggle
+  - Modal forms and popovers for interactive content
   - Status indicators with color coding
+  - Beautiful and accessible UI components
 
 ## Tech Stack
 
 - **Frontend**: React + TypeScript
 - **Backend/Auth**: Supabase (Auth and Postgres database)
-- **Styling**: Tailwind CSS
-- **Additional Libraries**: React Router DOM, React Hook Form, Headless UI
+- **Styling**: Tailwind CSS + shadcn/ui (built on Radix UI)
+- **Additional Libraries**: React Router DOM, React Hook Form, Lucide React (icons)
 
 ## Setup Instructions
 
