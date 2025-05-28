@@ -200,16 +200,23 @@ const TaskList: React.FC<TaskListProps> = ({
                 <TableCell className={getDueDateColor(task.due_date)}>
                   {format(new Date(task.due_date), 'MMM d, yyyy')}
                 </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
+                <TableCell className="text-right">
+                  <div className="flex justify-end space-x-2">
+                    {!task.completed && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleComplete(task)}
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => onEdit(task)}
-                      disabled={task.completed}
                     >
                       <Edit className="h-4 w-4" />
-                      <span className="sr-only">Edit</span>
                     </Button>
                     <Button
                       variant="ghost"
@@ -217,7 +224,6 @@ const TaskList: React.FC<TaskListProps> = ({
                       onClick={() => openDeleteDialog(task.id!)}
                     >
                       <Trash className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
                     </Button>
                   </div>
                 </TableCell>

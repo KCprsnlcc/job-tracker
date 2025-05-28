@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getTasks, getDueTasks } from '../services/taskService';
+import { getTasks, getDueTasks, completeTask, deleteTask } from '../services/taskService';
 import { Task } from '../types';
 import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { LogOut, CheckSquare, Plus, Clock, Filter } from 'lucide-react';
+import { LogOut, CheckSquare, Plus, Clock, Filter, Check, Trash } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
@@ -167,6 +167,15 @@ const TaskManager: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
+            
+            <Button variant="outline" asChild>
+              <Link to="/dashboard" className="flex items-center gap-1">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Dashboard
+              </Link>
+            </Button>
 
             <Button
               onClick={handleAddTask}
@@ -210,8 +219,14 @@ const TaskManager: React.FC = () => {
               </svg>
               Overdue
             </TabsTrigger>
+            <TabsTrigger value="completed" className="flex items-center gap-1" onClick={() => setFilterType('completed')}>
+              <Check className="h-4 w-4" />
+              Completed
+            </TabsTrigger>
           </TabsList>
         </Tabs>
+        
+
 
         <TaskList
           tasks={filteredTasks}
@@ -221,11 +236,7 @@ const TaskManager: React.FC = () => {
           loading={loading}
         />
 
-        <div className="mt-6 flex justify-end">
-          <Button variant="outline" asChild>
-            <Link to="/dashboard">Back to Dashboard</Link>
-          </Button>
-        </div>
+
       </main>
 
       <TaskForm
