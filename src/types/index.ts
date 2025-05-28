@@ -68,6 +68,11 @@ export interface AnalyticsData {
   interviewRate: number;
   offerRate: number;
   averageResponseTime?: number;
+  // Task-related properties
+  totalTasks?: number;
+  tasksByStatus?: Record<string, number>;
+  tasksByPriority?: Record<string, number>;
+  upcomingTasksDue?: number;
 }
 
 export type SortField = 'company' | 'role' | 'date_applied' | 'location' | 'status';

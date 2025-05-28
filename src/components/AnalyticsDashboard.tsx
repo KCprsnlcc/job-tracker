@@ -270,12 +270,10 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ data }) => {
               <span className="text-muted-foreground text-sm">Offer Rate</span>
               <span className="text-2xl font-bold">{analyticsData.offerRate.toFixed(1)}%</span>
             </div>
-            {analyticsData.averageResponseTime && (
-              <div className="flex flex-col items-center justify-center p-4 bg-background rounded-lg border">
-                <span className="text-muted-foreground text-sm">Avg. Response Time</span>
-                <span className="text-2xl font-bold">{analyticsData.averageResponseTime.toFixed(1)} days</span>
-              </div>
-            )}
+            <div className="flex flex-col items-center justify-center p-4 bg-background rounded-lg border">
+              <span className="text-muted-foreground text-sm">Avg. Response Time</span>
+              <span className="text-2xl font-bold">{(analyticsData.averageResponseTime || 1.0).toFixed(1)} days</span>
+            </div>
           </div>
         </CardContent>
       </Card>
