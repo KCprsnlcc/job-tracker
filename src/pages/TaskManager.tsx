@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getTasks, getDueTasks, completeTask, deleteTask } from '../services/taskService';
+import { getTasks } from '../services/taskService';
 import { Task } from '../types';
 import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { LogOut, CheckSquare, Plus, Clock, Filter, Check, Trash } from 'lucide-react';
+import { LogOut, CheckSquare, Plus, Clock, Filter, Check } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
 import { Link } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -170,9 +170,6 @@ const TaskManager: React.FC = () => {
             
             <Button variant="outline" asChild>
               <Link to="/dashboard" className="flex items-center gap-1">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
                 Back to Dashboard
               </Link>
             </Button>
