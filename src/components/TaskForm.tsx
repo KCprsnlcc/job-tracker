@@ -26,7 +26,7 @@ import { Calendar } from './ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
 interface TaskFormProps {
   isOpen: boolean;
@@ -55,7 +55,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
     title: '',
     description: '',
     due_date: new Date().toISOString(),
-    priority: 'Medium',
+    priority: 'medium',
     job_id: jobId || 'none',
   });
 
@@ -94,7 +94,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
         title: '',
         description: '',
         due_date: new Date().toISOString(),
-        priority: 'Medium',
+        priority: 'medium',
         job_id: jobId || 'none',
       });
       setDate(new Date());
@@ -224,9 +224,9 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 <SelectValue placeholder="Select priority" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Low">Low</SelectItem>
-                <SelectItem value="Medium">Medium</SelectItem>
-                <SelectItem value="High">High</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
               </SelectContent>
             </Select>
           </div>

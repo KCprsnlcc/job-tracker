@@ -20,18 +20,18 @@ interface JobFormProps {
 }
 
 const statusOptions: JobStatus[] = [
-  'Applied',
-  'Interview',
-  'Offer',
-  'Rejected',
-  'No Response',
+  JobStatus.APPLIED,
+  JobStatus.INTERVIEW,
+  JobStatus.OFFER,
+  JobStatus.REJECTED,
+  JobStatus.NO_RESPONSE,
 ];
 
 const JobForm: React.FC<JobFormProps> = ({ isOpen, onClose, job, onSuccess }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<JobStatus>(job?.status as JobStatus || 'Applied');
+  const [status, setStatus] = useState<JobStatus>(job?.status as JobStatus || JobStatus.APPLIED);
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm<JobFormData>({
     defaultValues: {
@@ -40,7 +40,7 @@ const JobForm: React.FC<JobFormProps> = ({ isOpen, onClose, job, onSuccess }) =>
       date_applied: new Date().toISOString().split('T')[0],
       location: '',
       link: '',
-      status: 'Applied',
+      status: JobStatus.APPLIED,
     },
   });
 
@@ -62,9 +62,9 @@ const JobForm: React.FC<JobFormProps> = ({ isOpen, onClose, job, onSuccess }) =>
         date_applied: new Date().toISOString().split('T')[0],
         location: '',
         link: '',
-        status: 'Applied',
+        status: JobStatus.APPLIED,
       });
-      setStatus('Applied');
+      setStatus(JobStatus.APPLIED);
     }
   }, [job, reset]);
 
@@ -83,7 +83,7 @@ const JobForm: React.FC<JobFormProps> = ({ isOpen, onClose, job, onSuccess }) =>
         await updateJob(job.id, data);
       } else {
         // Create new job
-        await createJob(user.id, data);
+        await createJob(data, user.id);
       }
       
       onSuccess();
