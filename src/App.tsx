@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import LandingPage from './pages/LandingPage';
+import AuthCallback from './pages/AuthCallback';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
@@ -23,6 +24,7 @@ function App() {
                 <Dashboard />
               </ProtectedRoute>
             } />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/" element={<LandingPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
