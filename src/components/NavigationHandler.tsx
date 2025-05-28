@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const PROTECTED_ROUTES = ['/dashboard', '/analytics', '/tasks'];
-const AUTH_PAGES = ['/login', '/signup'];
+const PUBLIC_AUTH_PAGES = ['/login', '/signup', '/'];
 
 const NavigationHandler: React.FC = () => {
   const { session, loading } = useAuth();
@@ -11,6 +11,7 @@ const NavigationHandler: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
+    console.log('NavigationHandler: useEffect triggered. Loading:', loading, 'Session:', !!session, 'Path:', location.pathname);
     if (loading) {
       return; // Wait until authentication status is resolved
     }
@@ -19,7 +20,7 @@ const NavigationHandler: React.FC = () => {
 
     if (session) {
       // User is authenticated
-      if (AUTH_PAGES.includes(currentPath)) {
+      if (PUBLIC_AUTH_PAGES.includes(currentPath)) {
         navigate('/dashboard', { replace: true });
       }
     } else {
