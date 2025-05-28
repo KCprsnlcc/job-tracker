@@ -145,9 +145,12 @@ const Login: React.FC = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1, rotate: [0, 0, 360] }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
+                    initial={{ scale: 0, rotate: 0 }} 
+                    animate={{ scale: 1, rotate: [0, 0, 360] }} 
+                    transition={{
+                      scale: { type: "spring", stiffness: 260, damping: 20, delay: 0.2 }, 
+                      rotate: { type: "tween", duration: 0.5, ease: "circOut", delay: 0.2, times: [0, 0.5, 1] } 
+                    }}
                   >
                     <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                   </motion.div>

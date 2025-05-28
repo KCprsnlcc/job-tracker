@@ -172,9 +172,12 @@ const Signup: React.FC = () => {
             
             <motion.div 
               className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-2"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1, rotate: [0, 10, 0] }}
-              transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.4 }}
+              initial={{ scale: 0, rotate: 0 }} 
+              animate={{ scale: 1, rotate: [0, 10, 0] }} 
+              transition={{
+                scale: { type: "spring", stiffness: 260, damping: 20, delay: 0.4 }, 
+                rotate: { type: "tween", duration: 0.5, ease: "circOut", delay: 0.4, times: [0, 0.5, 1] } 
+              }}
               whileHover={{ scale: 1.1, rotate: 5 }}
             >
               <Mail className="h-8 w-8 text-primary" />
