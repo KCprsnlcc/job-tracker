@@ -69,12 +69,21 @@ export const getDueTasks = async (userId: string): Promise<Task[]> => {
  */
 export const createTask = async (userId: string, taskData: TaskFormData): Promise<Task> => {
   // Ensure the priority is one of the allowed values
-  if (!['low', 'medium', 'high'].includes(taskData.priority)) {
+  if (!['low', 'medium', 'high'].includes(taskData.priority.toLowerCase())) {
     throw new Error('Invalid priority value. Must be low, medium, or high.');
   }
   
-  const newTask: any = {
-    ...taskData,
+  // Convert priority to capitalized format to match database constraints (Low, Medium, High)
+  // The database constraint expects 'Low', 'Medium', 'High' while our TypeScript types use lowercase
+  const capitalizedPriority = taskData.priority.charAt(0).toUpperCase() + taskData.priority.slice(1).toLowerCase();
+  
+  // Create a clean task object with only the fields the database expects
+  const newTask = {
+    title: taskData.title,
+    description: taskData.description || null,
+    due_date: taskData.due_date,
+    priority: capitalizedPriority, // Capitalized to match database constraints
+    job_id: taskData.job_id || null,
     user_id: userId,
     completed: false
   };
@@ -108,13 +117,28 @@ export const createTask = async (userId: string, taskData: TaskFormData): Promis
  */
 export const updateTask = async (taskId: string, taskData: Partial<TaskFormData>): Promise<Task> => {
   // If priority is being updated, ensure it's one of the allowed values
-  if (taskData.priority && !['low', 'medium', 'high'].includes(taskData.priority)) {
+  if (taskData.priority && !['low', 'medium', 'high'].includes(taskData.priority.toLowerCase())) {
     throw new Error('Invalid priority value. Must be low, medium, or high.');
+  }
+  
+  // Create a copy of taskData for the database with properly capitalized priority
+  const dbTaskData = { ...taskData };
+  
+  // If priority is being updated, capitalize it to match database constraints
+  if (dbTaskData.priority) {
+    // Create a properly capitalized priority string for the database
+    // The database constraint expects 'Low', 'Medium', 'High'
+    // While our TypeScript types use lowercase
+    const capitalizedPriority = dbTaskData.priority.charAt(0).toUpperCase() + dbTaskData.priority.slice(1).toLowerCase();
+    
+    // Use type assertion to handle the priority for database - the actual value is capitalized
+    // but we need to maintain type compatibility with our interface
+    dbTaskData.priority = capitalizedPriority as 'low' | 'medium' | 'high';
   }
 
   const { data, error } = await supabase
     .from('tasks')
-    .update(taskData)
+    .update(dbTaskData)
     .eq('id', taskId)
     .select(`
       *,
