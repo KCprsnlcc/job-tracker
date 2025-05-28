@@ -56,7 +56,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
     description: '',
     due_date: new Date().toISOString(),
     priority: 'Medium',
-    job_id: jobId || '',
+    job_id: jobId || 'none',
   });
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
         description: '',
         due_date: new Date().toISOString(),
         priority: 'Medium',
-        job_id: jobId || '',
+        job_id: jobId || 'none',
       });
       setDate(new Date());
     }
@@ -129,11 +129,19 @@ const TaskForm: React.FC<TaskFormProps> = ({
     try {
       setLoading(true);
       setError(null);
+      
+      // Create a copy of the form data to submit
+      const dataToSubmit = { ...formData };
+      
+      // If job_id is 'none', set it to an empty string for the backend
+      if (dataToSubmit.job_id === 'none') {
+        dataToSubmit.job_id = '';
+      }
 
       if (task) {
-        await updateTask(task.id!, formData);
+        await updateTask(task.id!, dataToSubmit);
       } else {
-        await createTask(user.id, formData);
+        await createTask(user.id, dataToSubmit);
       }
 
       onSuccess();
@@ -234,7 +242,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
                   <SelectValue placeholder="Select a job" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Not related to a job</SelectItem>
+                  <SelectItem value="none">Not related to a job</SelectItem>
                   {availableJobs.map((job) => (
                     <SelectItem key={job.id} value={job.id}>
                       {job.company} - {job.role}

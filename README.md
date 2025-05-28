@@ -4,7 +4,7 @@ A modern web application built with React, TypeScript, and Supabase to help user
 
 ## Screenshot Preview
 
-<p align="center"> <strong> <i> Job Tracker Application </i></strong></p>
+<p align="center"> <strong> Job Tracker Application </strong></p>
 
 ![Job Tracker Dashboard Preview](./public/image.png)
 
