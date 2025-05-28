@@ -1,3 +1,47 @@
+-- Enable UUID extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Create jobs table for tracking job applications
+CREATE TABLE IF NOT EXISTS jobs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  company TEXT NOT NULL,
+  role TEXT NOT NULL,
+  date_applied DATE NOT NULL,
+  location TEXT,
+  link TEXT,
+  status TEXT NOT NULL CHECK (status IN ('Applied', 'Screening', 'Interview', 'Technical', 'Offer', 'Rejected', 'Withdrawn')),
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Add RLS (Row Level Security) policies for jobs table
+ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
+
+-- Only authenticated users can view their own jobs
+CREATE POLICY "Users can view their own jobs" ON jobs
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Only authenticated users can insert their own jobs
+CREATE POLICY "Users can insert their own jobs" ON jobs
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Only authenticated users can update their own jobs
+CREATE POLICY "Users can update their own jobs" ON jobs
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Only authenticated users can delete their own jobs
+CREATE POLICY "Users can delete their own jobs" ON jobs
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Create indexes for jobs table
+CREATE INDEX IF NOT EXISTS jobs_user_id_idx ON jobs (user_id);
+CREATE INDEX IF NOT EXISTS jobs_company_idx ON jobs (company);
+CREATE INDEX IF NOT EXISTS jobs_role_idx ON jobs (role);
+CREATE INDEX IF NOT EXISTS jobs_date_applied_idx ON jobs (date_applied);
+CREATE INDEX IF NOT EXISTS jobs_status_idx ON jobs (status);
+
 -- Create tasks table for task management feature
 CREATE TABLE IF NOT EXISTS tasks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -81,3 +125,196 @@ CREATE TRIGGER job_status_change_trigger
 AFTER UPDATE ON jobs
 FOR EACH ROW
 EXECUTE FUNCTION update_job_status_history();
+
+-- Create job_responses table to track company responses
+CREATE TABLE IF NOT EXISTS job_responses (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  response_date TIMESTAMP WITH TIME ZONE NOT NULL,
+  response_type TEXT NOT NULL CHECK (response_type IN ('Initial Response', 'Interview Request', 'Rejection', 'Offer', 'Other')),
+  response_time_days INTEGER, -- Days between application and response
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Add RLS (Row Level Security) policies for job_responses table
+ALTER TABLE job_responses ENABLE ROW LEVEL SECURITY;
+
+-- Only authenticated users can view their own job responses
+CREATE POLICY "Users can view their own job responses" ON job_responses
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Only authenticated users can insert their own job responses
+CREATE POLICY "Users can insert their own job responses" ON job_responses
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Only authenticated users can update their own job responses
+CREATE POLICY "Users can update their own job responses" ON job_responses
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Only authenticated users can delete their own job responses
+CREATE POLICY "Users can delete their own job responses" ON job_responses
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Create indexes for job_responses table
+CREATE INDEX IF NOT EXISTS job_responses_job_id_idx ON job_responses (job_id);
+CREATE INDEX IF NOT EXISTS job_responses_user_id_idx ON job_responses (user_id);
+CREATE INDEX IF NOT EXISTS job_responses_response_date_idx ON job_responses (response_date);
+CREATE INDEX IF NOT EXISTS job_responses_response_type_idx ON job_responses (response_type);
+
+-- Create function to calculate response time in days
+CREATE OR REPLACE FUNCTION calculate_response_time()
+RETURNS TRIGGER AS $$
+DECLARE
+  applied_date DATE;
+BEGIN
+  -- Get the date the job was applied
+  SELECT date_applied INTO applied_date FROM jobs WHERE id = NEW.job_id;
+  
+  -- Calculate the response time in days
+  NEW.response_time_days := EXTRACT(DAY FROM (NEW.response_date::timestamp - applied_date::timestamp));
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger to calculate response time when a response is added
+DROP TRIGGER IF EXISTS calculate_response_time_trigger ON job_responses;
+CREATE TRIGGER calculate_response_time_trigger
+BEFORE INSERT ON job_responses
+FOR EACH ROW
+EXECUTE FUNCTION calculate_response_time();
+
+-- Create user_analytics table to store pre-calculated analytics
+CREATE TABLE IF NOT EXISTS user_analytics (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  total_applications INTEGER DEFAULT 0,
+  response_rate NUMERIC(5,2) DEFAULT 0, -- Percentage
+  average_response_time NUMERIC(5,2) DEFAULT 0, -- Days
+  applications_by_status JSONB, -- JSON with counts by status
+  applications_by_month JSONB, -- JSON with counts by month
+  last_updated TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Add RLS (Row Level Security) policies for user_analytics table
+ALTER TABLE user_analytics ENABLE ROW LEVEL SECURITY;
+
+-- Only authenticated users can view their own analytics
+CREATE POLICY "Users can view their own analytics" ON user_analytics
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Create function to update user analytics
+CREATE OR REPLACE FUNCTION update_user_analytics(user_uuid UUID)
+RETURNS VOID AS $$
+DECLARE
+  total_apps INTEGER;
+  total_responses INTEGER;
+  avg_response_time NUMERIC(5,2);
+  status_counts JSONB;
+  monthly_counts JSONB;
+BEGIN
+  -- Count total applications
+  SELECT COUNT(*) INTO total_apps FROM jobs WHERE user_id = user_uuid;
+  
+  -- Count total responses
+  SELECT COUNT(*) INTO total_responses FROM job_responses WHERE user_id = user_uuid;
+  
+  -- Calculate response rate
+  IF total_apps > 0 THEN
+    avg_response_time := (SELECT COALESCE(AVG(response_time_days), 0) FROM job_responses WHERE user_id = user_uuid);
+  ELSE
+    avg_response_time := 0;
+  END IF;
+  
+  -- Get application counts by status
+  SELECT jsonb_object_agg(status, count) INTO status_counts
+  FROM (
+    SELECT status, COUNT(*) as count
+    FROM jobs
+    WHERE user_id = user_uuid
+    GROUP BY status
+  ) AS status_data;
+  
+  -- Get application counts by month
+  SELECT jsonb_object_agg(month_year, count) INTO monthly_counts
+  FROM (
+    SELECT TO_CHAR(date_applied, 'YYYY-MM') as month_year, COUNT(*) as count
+    FROM jobs
+    WHERE user_id = user_uuid
+    GROUP BY TO_CHAR(date_applied, 'YYYY-MM')
+    ORDER BY month_year
+  ) AS monthly_data;
+  
+  -- Update or insert analytics record
+  INSERT INTO user_analytics (
+    user_id, total_applications, response_rate, average_response_time,
+    applications_by_status, applications_by_month, last_updated
+  )
+  VALUES (
+    user_uuid, total_apps,
+    CASE WHEN total_apps > 0 THEN (total_responses * 100.0 / total_apps) ELSE 0 END,
+    avg_response_time, COALESCE(status_counts, '{}'::jsonb),
+    COALESCE(monthly_counts, '{}'::jsonb), now()
+  )
+  ON CONFLICT (user_id) DO UPDATE SET
+    total_applications = EXCLUDED.total_applications,
+    response_rate = EXCLUDED.response_rate,
+    average_response_time = EXCLUDED.average_response_time,
+    applications_by_status = EXCLUDED.applications_by_status,
+    applications_by_month = EXCLUDED.applications_by_month,
+    last_updated = EXCLUDED.last_updated;
+  
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create function triggers to update analytics when jobs or responses change
+CREATE OR REPLACE FUNCTION trigger_update_user_analytics()
+RETURNS TRIGGER AS $$
+BEGIN
+  PERFORM update_user_analytics(NEW.user_id);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create triggers for jobs table
+DROP TRIGGER IF EXISTS update_analytics_on_job_change ON jobs;
+CREATE TRIGGER update_analytics_on_job_change
+AFTER INSERT OR UPDATE OR DELETE ON jobs
+FOR EACH ROW
+EXECUTE FUNCTION trigger_update_user_analytics();
+
+-- Create triggers for job_responses table
+DROP TRIGGER IF EXISTS update_analytics_on_response_change ON job_responses;
+CREATE TRIGGER update_analytics_on_response_change
+AFTER INSERT OR UPDATE OR DELETE ON job_responses
+FOR EACH ROW
+EXECUTE FUNCTION trigger_update_user_analytics();
+
+-- Create user settings table for preferences
+CREATE TABLE IF NOT EXISTS user_settings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+  theme TEXT NOT NULL DEFAULT 'light',
+  notification_preferences JSONB DEFAULT '{"email":true, "inApp":true}'::jsonb,
+  default_job_view TEXT NOT NULL DEFAULT 'list',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Add RLS (Row Level Security) policies for user_settings table
+ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
+
+-- Only authenticated users can view their own settings
+CREATE POLICY "Users can view their own settings" ON user_settings
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Only authenticated users can insert their own settings
+CREATE POLICY "Users can insert their own settings" ON user_settings
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Only authenticated users can update their own settings
+CREATE POLICY "Users can update their own settings" ON user_settings
+  FOR UPDATE USING (auth.uid() = user_id);

@@ -11,7 +11,7 @@ A modern web application built with React, TypeScript, and Supabase to help user
 
 | Tracking Jobs | Manage Tasks|
 |:-------------------------:|:-------------------:|
-| ![Job Tracking](./public/Image2.png) | ![Task Management](./public/Image1.png) |
+| ![Job Tracking](./public/image2.png) | ![Task Management](./public/image1.png) |
 
 ## Features
 
