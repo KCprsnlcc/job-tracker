@@ -4,8 +4,14 @@ A modern web application built with React, TypeScript, and Supabase to help user
 
 ## Screenshot Preview
 
-![Job Tracker Dashboard Preview](./public/dashboard-preview.png)
-*Dashboard view of the Job Tracker application*
+<p align="center"> <strong> <i> Job Tracker Application </i></strong></p>
+
+![Job Tracker Dashboard Preview](./public/image.png)
+
+
+| Tracking Jobs | Manage Tasks|
+|:-------------------------:|:-------------------:|
+| ![Job Tracking](./public/Image2.png) | ![Task Management](./public/Image1.png) |
 
 ## Features
 
