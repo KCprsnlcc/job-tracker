@@ -185,8 +185,11 @@ const TaskList: React.FC<TaskListProps> = ({
                 </TableCell>
                 {showJobInfo && (
                   <TableCell>
-                    {task.job_id ? (
-                      <div>Job info</div>
+                    {task.job_id && task.job_info ? (
+                      <div>
+                        <div className="font-medium">{task.job_info.company}</div>
+                        <div className="text-sm text-muted-foreground">{task.job_info.role}</div>
+                      </div>
                     ) : (
                       <span className="text-muted-foreground text-sm">None</span>
                     )}
