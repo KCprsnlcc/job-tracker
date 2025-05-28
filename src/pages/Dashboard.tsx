@@ -7,8 +7,9 @@ import JobTable from '../components/JobTable';
 import DeleteConfirmation from '../components/DeleteConfirmation';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { Search, Plus, LogOut, BarChart2, CheckSquare, Bell } from 'lucide-react';
+import { Search, Plus, LogOut, BarChart2, CheckSquare, Bell, ArrowRight } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
 // Import shadcn components
 import { Button } from '../components/ui/button';
@@ -147,147 +148,345 @@ const Dashboard: React.FC = () => {
     }
   });
 
+  // For scroll-based animations
+  const { scrollY } = useScroll();
+  const headerOpacity = useTransform(scrollY, [0, 50], [1, 0.9]);
+  
+  // Animation variants for staggered animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { type: "spring", stiffness: 300, damping: 24 }
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-card border-b border-border">
+    <motion.div 
+      className="min-h-screen bg-background"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.header 
+        className="bg-card border-b border-border sticky top-0 z-10"
+        style={{ opacity: headerOpacity }}
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <img src="/favicon.ico" alt="Job Tracker" className="w-6 h-6" />
+          <motion.h1 
+            className="text-2xl font-bold flex items-center gap-2"
+            whileHover={{ scale: 1.03 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          >
+            <motion.img 
+              src="/favicon.ico" 
+              alt="Job Tracker" 
+              className="w-6 h-6" 
+              initial={{ rotate: 0 }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, delay: 0.5 }}
+            />
             Job Tracker
-          </h1>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <ThemeToggle />
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => signOut()}
-              className="flex items-center gap-1"
+          </motion.h1>
+          <motion.div 
+            className="flex items-center space-x-4"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <motion.span 
+              className="text-sm text-muted-foreground"
+              whileHover={{ color: "var(--primary)" }}
+              transition={{ duration: 0.2 }}
             >
-              <LogOut className="h-4 w-4" />
-              <span>Sign Out</span>
-            </Button>
-          </div>
+              {user?.email}
+            </motion.span>
+            <ThemeToggle />
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => signOut()}
+                className="flex items-center gap-1 relative overflow-hidden"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out</span>
+                <motion.div 
+                  className="absolute inset-0 bg-primary/10" 
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
+              </Button>
+            </motion.div>
+          </motion.div>
         </div>
-      </header>
+      </motion.header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
-          <div>
-            <h2 className="text-xl font-semibold">Your Job Applications</h2>
-            <p className="text-sm text-muted-foreground mt-1">
+      <motion.main 
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        <motion.div 
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0"
+          variants={itemVariants}
+        >
+          <motion.div>
+            <motion.h2 
+              className="text-xl font-semibold"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              Your Job Applications
+            </motion.h2>
+            <motion.p 
+              className="text-sm text-muted-foreground mt-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
               {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'} found
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
-          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-            <div className="relative">
+          <motion.div 
+            className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <motion.div 
+              className="relative"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search jobs..."
-                className="pl-8 w-full sm:w-[200px] lg:w-[300px]"
+                className="pl-8 w-full sm:w-[200px] lg:w-[300px] transition-all duration-300 focus:ring-2 focus:ring-primary/50"
                 value={searchTerm}
                 onChange={handleSearch}
               />
-            </div>
+            </motion.div>
 
-            <Button
-              onClick={handleAddJob}
-              className="flex items-center gap-1"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <Plus className="h-4 w-4" />
-              <span>Add Job</span>
-            </Button>
-          </div>
-        </div>
+              <Button
+                onClick={handleAddJob}
+                className="flex items-center gap-1 relative overflow-hidden"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add Job</span>
+                <motion.div 
+                  className="absolute inset-0 bg-white/20" 
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                />
+              </Button>
+            </motion.div>
+          </motion.div>
+        </motion.div>
 
-        {error && (
-          <Card className="bg-destructive/10 border-destructive p-4 mb-6">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-destructive">Error</h3>
-                <div className="mt-1 text-sm text-destructive/90">{error}</div>
-              </div>
-            </div>
-          </Card>
-        )}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="bg-destructive/10 border-destructive p-4">
+                <div className="flex">
+                  <motion.div 
+                    className="flex-shrink-0"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1, rotate: [0, 0, 360] }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <svg className="h-5 w-5 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </motion.div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-destructive">Error</h3>
+                    <div className="mt-1 text-sm text-destructive/90">{error}</div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
+          variants={itemVariants}
+        >
           {/* Analytics Card */}
-          <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-            <CardHeader className="pb-3 flex flex-row items-center gap-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <BarChart2 className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <CardTitle>Progress Analytics</CardTitle>
-                <CardDescription>Get insights into your job search</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pb-3 text-sm">
-              <p>
-                View statistics and trends to understand your job search progress. Track response rates, interview success, and identify patterns in your applications.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
-                <Link to="/analytics" className="flex items-center justify-center gap-2">
-                  <BarChart2 className="h-4 w-4" />
-                  View Analytics
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
+          <motion.div
+            whileHover={{ scale: 1.02, y: -5 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          >
+            <Card className="overflow-hidden h-full">
+              <CardHeader className="pb-3 flex flex-row items-center gap-2">
+                <motion.div 
+                  className="bg-primary/10 p-2 rounded-full"
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <BarChart2 className="h-6 w-6 text-primary" />
+                </motion.div>
+                <div>
+                  <CardTitle>Progress Analytics</CardTitle>
+                  <CardDescription>Get insights into your job search</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="pb-3 text-sm">
+                <p>
+                  View statistics and trends to understand your job search progress. Track response rates, interview success, and identify patterns in your applications.
+                </p>
+              </CardContent>
+              <CardFooter>
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full"
+                >
+                  <Button asChild className="w-full relative overflow-hidden">
+                    <Link to="/analytics" className="flex items-center justify-center gap-2">
+                      <BarChart2 className="h-4 w-4" />
+                      <span>View Analytics</span>
+                      <motion.div 
+                        animate={{ x: [0, 5, 0] }} 
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </motion.div>
+                      <motion.div 
+                        className="absolute inset-0 bg-primary/10" 
+                        initial={{ x: "-100%" }}
+                        whileHover={{ x: "100%" }}
+                        transition={{ duration: 0.8, ease: "easeInOut" }}
+                      />
+                    </Link>
+                  </Button>
+                </motion.div>
+              </CardFooter>
+            </Card>
+          </motion.div>
 
           {/* Task Management Card */}
-          <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-            <CardHeader className="pb-3 flex flex-row items-center gap-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <CheckSquare className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <CardTitle>Task Management</CardTitle>
-                <CardDescription>Never miss important deadlines</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pb-3 text-sm">
-              <p>
-                Set reminders for follow-ups, interviews, and application deadlines. Organize tasks by priority and track your progress to stay on top of your job search.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
-                <Link to="/tasks" className="flex items-center justify-center gap-2">
-                  <CheckSquare className="h-4 w-4" />
-                  Manage Tasks
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+          <motion.div
+            whileHover={{ scale: 1.02, y: -5 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          >
+            <Card className="overflow-hidden h-full">
+              <CardHeader className="pb-3 flex flex-row items-center gap-2">
+                <motion.div 
+                  className="bg-primary/10 p-2 rounded-full"
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <CheckSquare className="h-6 w-6 text-primary" />
+                </motion.div>
+                <div>
+                  <CardTitle>Task Management</CardTitle>
+                  <CardDescription>Never miss important deadlines</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="pb-3 text-sm">
+                <p>
+                  Set reminders for follow-ups, interviews, and application deadlines. Organize tasks by priority and track your progress to stay on top of your job search.
+                </p>
+              </CardContent>
+              <CardFooter>
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full"
+                >
+                  <Button asChild className="w-full relative overflow-hidden">
+                    <Link to="/tasks" className="flex items-center justify-center gap-2">
+                      <CheckSquare className="h-4 w-4" />
+                      <span>Manage Tasks</span>
+                      <motion.div 
+                        animate={{ x: [0, 5, 0] }} 
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </motion.div>
+                      <motion.div 
+                        className="absolute inset-0 bg-primary/10" 
+                        initial={{ x: "-100%" }}
+                        whileHover={{ x: "100%" }}
+                        transition={{ duration: 0.8, ease: "easeInOut" }}
+                      />
+                    </Link>
+                  </Button>
+                </motion.div>
+              </CardFooter>
+            </Card>
+          </motion.div>
+        </motion.div>
 
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-          </div>
-        ) : (
-          <JobTable
-            jobs={sortedJobs}
-            onEdit={handleEditJob}
-            onDelete={handleDeleteJob}
-            sortField={sortField}
-            sortDirection={sortDirection}
-            onSort={handleSort}
-          />
-        )}
-      </main>
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div 
+              className="flex justify-center py-12"
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div 
+                className="rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              ></motion.div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="table"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              variants={itemVariants}
+            >
+              <JobTable
+                jobs={sortedJobs}
+                onEdit={handleEditJob}
+                onDelete={handleDeleteJob}
+                sortField={sortField}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.main>
 
       <JobForm
         isOpen={isFormOpen}
@@ -303,7 +502,7 @@ const Dashboard: React.FC = () => {
       />
       
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 
