@@ -17,6 +17,7 @@ A modern web application built with React, TypeScript, and Supabase to help user
 
 - **Authentication**
   - Sign up, log in, and log out functionality using Supabase Auth
+  - Google and Facebook OAuth for quick sign-in/sign-up
   - Protected routes to ensure only authenticated users can access their data
 
 - **Job Application Management**
@@ -38,6 +39,7 @@ A modern web application built with React, TypeScript, and Supabase to help user
 
 - **Modern UI**
   - Sleek, responsive interface built with Tailwind CSS and shadcn/ui components
+  - Enhanced with smooth animations and interactive elements using Framer Motion
   - Dark/light theme toggle
   - Modal forms and popovers for interactive content
   - Status indicators with color coding
@@ -48,6 +50,7 @@ A modern web application built with React, TypeScript, and Supabase to help user
 - **Frontend**: React + TypeScript
 - **Backend/Auth**: Supabase (Auth and Postgres database)
 - **Styling**: Tailwind CSS + shadcn/ui (built on Radix UI)
+- **Animation**: Framer Motion
 - **Additional Libraries**: React Router DOM, React Hook Form, Lucide React (icons)
 
 ## Setup Instructions
@@ -73,11 +76,12 @@ A modern web application built with React, TypeScript, and Supabase to help user
 ### Supabase Setup
 
 1. Create a new Supabase project
-2. Enable Email authentication in the Authentication settings
-3. Open the SQL editor in your Supabase dashboard
-4. Copy and paste the entire contents of the `migration.sql` file in this project into the SQL editor
-5. Run the SQL script to create all necessary tables, indexes, triggers, and RLS policies
-6. All database tables will be created with proper Row Level Security (RLS) policies to ensure users can only access their own data
+2. Enable Email authentication in the Authentication settings.
+3. Enable Google and Facebook (or other desired) OAuth providers in the Authentication > Providers section. You will need to configure the Client ID and Client Secret for each provider, which you can obtain from the respective developer consoles (Google Cloud Console, Facebook for Developers).
+4. Open the SQL editor in your Supabase dashboard
+5. Copy and paste the entire contents of the `migration.sql` file in this project into the SQL editor
+6. Run the SQL script to create all necessary tables, indexes, triggers, and RLS policies
+7. All database tables will be created with proper Row Level Security (RLS) policies to ensure users can only access their own data
 
 ### Running the Application
 
