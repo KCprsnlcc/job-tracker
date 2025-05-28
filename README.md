@@ -1,46 +1,78 @@
-# Getting Started with Create React App
+# Job Tracker Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A web application built with React, TypeScript, and Supabase to help users manage their job applications. Users can track job applications with details like company, role, date applied, location, link, and status.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Authentication**
+  - Sign up, log in, and log out functionality using Supabase Auth
+  - Protected routes to ensure only authenticated users can access their data
 
-### `npm start`
+- **Job Application Management**
+  - Create, read, update, and delete job applications
+  - Track essential job information (company, role, date applied, location, link, status)
+  - Sort and filter job applications
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- **Modern UI**
+  - Clean, responsive interface built with Tailwind CSS
+  - Modal forms for adding and editing job entries
+  - Status indicators with color coding
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+- **Frontend**: React + TypeScript
+- **Backend/Auth**: Supabase (Auth and Postgres database)
+- **Styling**: Tailwind CSS
+- **Additional Libraries**: React Router DOM, React Hook Form, Headless UI
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup Instructions
 
-### `npm run build`
+### Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Node.js and npm
+- Supabase account with a new project
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository
+2. Install dependencies:
+   ```
+   npm install
+   ```
+3. Create a `.env` file in the root directory with your Supabase credentials:
+   ```
+   REACT_APP_SUPABASE_URL=your_supabase_url
+   REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
 
-### `npm run eject`
+### Supabase Setup
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. Create a new Supabase project
+2. Enable Email authentication in the Authentication settings
+3. Create a new table called `jobs` with the following columns:
+   - `id`: uuid (primary key)
+   - `user_id`: uuid (foreign key to auth.users)
+   - `company`: text
+   - `role`: text
+   - `date_applied`: date
+   - `location`: text
+   - `link`: text
+   - `status`: text
+   - `created_at`: timestamp
+4. Set up Row Level Security (RLS) policies to ensure users can only access their own data
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Running the Application
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
+npm start
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+The application will be available at http://localhost:3000
 
-## Learn More
+## Development
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Available Scripts
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- `npm start`: Run the app in development mode
+- `npm test`: Launch the test runner
+- `npm run build`: Build the app for production
