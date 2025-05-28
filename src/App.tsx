@@ -7,6 +7,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import LandingPage from './pages/LandingPage';
 import AuthCallback from './pages/AuthCallback';
+import Analytics from './pages/Analytics';
+import TaskManager from './pages/TaskManager';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
@@ -22,6 +24,16 @@ function App() {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            } />
+            <Route path="/tasks" element={
+              <ProtectedRoute>
+                <TaskManager />
               </ProtectedRoute>
             } />
             <Route path="/auth/callback" element={<AuthCallback />} />

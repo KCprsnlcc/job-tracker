@@ -7,13 +7,14 @@ import JobTable from '../components/JobTable';
 import DeleteConfirmation from '../components/DeleteConfirmation';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { Search, Plus, LogOut } from 'lucide-react';
+import { Search, Plus, LogOut, BarChart2, CheckSquare, Bell } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 
 // Import shadcn components
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Card } from '../components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -216,6 +217,61 @@ const Dashboard: React.FC = () => {
             </div>
           </Card>
         )}
+
+        {/* Feature Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Analytics Card */}
+          <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="pb-3 flex flex-row items-center gap-2">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <BarChart2 className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle>Progress Analytics</CardTitle>
+                <CardDescription>Get insights into your job search</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-3 text-sm">
+              <p>
+                View statistics and trends to understand your job search progress. Track response rates, interview success, and identify patterns in your applications.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button asChild className="w-full">
+                <Link to="/analytics" className="flex items-center justify-center gap-2">
+                  <BarChart2 className="h-4 w-4" />
+                  View Analytics
+                </Link>
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Task Management Card */}
+          <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="pb-3 flex flex-row items-center gap-2">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <CheckSquare className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle>Task Management</CardTitle>
+                <CardDescription>Never miss important deadlines</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-3 text-sm">
+              <p>
+                Set reminders for follow-ups, interviews, and application deadlines. Organize tasks by priority and track your progress to stay on top of your job search.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button asChild className="w-full">
+                <Link to="/tasks" className="flex items-center justify-center gap-2">
+                  <CheckSquare className="h-4 w-4" />
+                  Manage Tasks
+                </Link>
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-12">
