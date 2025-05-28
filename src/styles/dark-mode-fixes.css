@@ -1,0 +1,122 @@
+/* Dark mode text visibility fixes - comprehensive solution */
+
+/* Global text colors for dark mode */
+.dark * {
+  color-scheme: dark;
+}
+
+/* Fix all text colors in dark mode */
+.dark h1, 
+.dark h2, 
+.dark h3, 
+.dark h4, 
+.dark h5, 
+.dark h6,
+.dark p, 
+.dark span, 
+.dark div, 
+.dark label, 
+.dark a,
+.dark li,
+.dark td,
+.dark th {
+  color: white !important;
+}
+
+/* Headers specific fixes */
+.dark [class*="title"],
+.dark [class*="header"],
+.dark [class*="heading"] {
+  color: white !important;
+}
+
+/* Fix for Job Tracker header and Your Job Applications */
+.dark nav h1,
+.dark nav h2,
+.dark nav span,
+.dark .dashboard-title,
+.dark .dashboard-heading {
+  color: white !important;
+}
+
+/* Form elements fixes */
+.dark input,
+.dark select,
+.dark textarea,
+.dark .select-trigger,
+.dark .select-value,
+.dark option {
+  color: white !important;
+  background-color: hsl(var(--background)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark input::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Label fixes */
+.dark label {
+  color: white !important;
+}
+
+/* Modal/Dialog fixes */
+.dark [role="dialog"],
+.dark .dialog,
+.dark .modal,
+.dark [class*="dialog"],
+.dark [class*="modal"] {
+  color: white !important;
+  background-color: hsl(var(--background)) !important;
+}
+
+.dark [role="dialog"] *,
+.dark .dialog *,
+.dark .modal *,
+.dark [class*="dialog"] *,
+.dark [class*="modal"] * {
+  color: white !important;
+}
+
+/* Button specific fixes */
+.dark button {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark button[data-variant="default"] {
+  color: hsl(var(--primary-foreground)) !important;
+  background-color: hsl(var(--primary)) !important;
+}
+
+/* Table specific fixes */
+.dark table,
+.dark tbody,
+.dark thead,
+.dark tr,
+.dark th,
+.dark td {
+  color: white !important;
+}
+
+/* Dropdown fixes */
+.dark [role="listbox"],
+.dark [role="option"],
+.dark [class*="dropdown"],
+.dark [class*="popover"],
+.dark [class*="menu"] {
+  color: white !important;
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Card fixes */
+.dark .card,
+.dark [class*="card"] {
+  color: white !important;
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Toast notification fixes */
+.dark [role="status"],
+.dark [class*="toast"] {
+  color: white !important;
+}

@@ -5,6 +5,7 @@ import { Job, SortField, SortDirection } from '../types';
 import JobForm from '../components/JobForm';
 import JobTable from '../components/JobTable';
 import DeleteConfirmation from '../components/DeleteConfirmation';
+import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
 import { Search, Plus, LogOut } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
@@ -149,7 +150,10 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-background">
       <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Job Tracker</h1>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <img src="/favicon.ico" alt="Job Tracker" className="w-6 h-6" />
+            Job Tracker
+          </h1>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
             <ThemeToggle />
@@ -241,6 +245,8 @@ const Dashboard: React.FC = () => {
         onClose={closeDeleteDialog}
         onConfirm={confirmDeleteJob}
       />
+      
+      <Footer />
     </div>
   );
 };

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="8" fill="#3b82f6" />
+  <text x="32" y="42" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white" text-anchor="middle">JT</text>
+  <path d="M16 16 L48 16 L48 20 L16 20 Z" fill="white" />
+  <path d="M16 24 L48 24 L48 28 L16 28 Z" fill="white" />
+  <path d="M16 32 L32 32 L32 36 L16 36 Z" fill="white" />
+</svg>
