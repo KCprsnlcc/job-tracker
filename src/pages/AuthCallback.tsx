@@ -12,61 +12,68 @@ const AuthCallback: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // The authentication verification is handled automatically by Supabase
-    // when the redirect happens. We just need to check if we're on this page
-    // because of a successful verification.
-    const handleEmailVerification = async () => {
+    const handleAuthCallback = async () => {
+      setVerificationStatus('loading'); // Explicitly set loading at the start
       try {
-        // Get the current auth session
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          throw error;
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+        if (sessionError) {
+          console.error('Error getting session:', sessionError);
+          throw sessionError;
         }
-        
-        // If we have a session, the verification was successful
-        if (data && data.session) {
+
+        if (session) {
           setVerificationStatus('success');
+          navigate('/dashboard');
           return;
         }
-        
-        // Check for hash parameters in URL that might indicate verification
-        const hash = window.location.hash;
-        if (hash && (hash.includes('type=recovery') || hash.includes('type=signup'))) {
-          setVerificationStatus('success');
-          return;
-        }
-        
-        // Check if we have a code in the URL
+
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const type = hashParams.get('type');
         const code = searchParams.get('code');
-        if (code) {
-          // Exchange the code for a session
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) {
-            throw error;
-          }
+
+        if (type === 'recovery' || type === 'signup') {
+          // Email link verification (magic link, signup confirmation, recovery)
+          // The UI will show "Verification Successful!" and a "Continue to Login" button.
           setVerificationStatus('success');
-          return;
+          // Set a more specific message for this flow if needed, or keep generic.
+          // setSuccessMessage("Your email has been verified. Please proceed to login.");
+        } else if (code) {
+          // PKCE flow for email verification
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) {
+            console.error('Error exchanging code for session:', exchangeError);
+            throw exchangeError;
+          }
+          // Session should now be established.
+          setVerificationStatus('success');
+          navigate('/dashboard');
+        } else if (searchParams.toString() || window.location.hash) {
+          // If there are any other params or hash, but no session and not handled above,
+          // it might be an incomplete or erroneous OAuth redirect or other link.
+          // Let Supabase attempt to handle it by just checking session again after a brief moment,
+          // as sometimes the session is not immediately available.
+          // This part is a bit speculative and depends on Supabase client behavior.
+          // For now, we can treat it as an unknown state that might resolve to a session.
+          // Or, more conservatively, treat as an error if not fitting known patterns.
+          console.warn('AuthCallback: Unhandled parameters, attempting to re-check session shortly.');
+          // If after a brief delay, no session, then it's an error.
+          // This could be simplified by removing this else if and letting it fall to the final else.
+          // For now, let's assume if it's not one of the above, it's an error.
+          throw new Error('Invalid or incomplete authentication parameters.');
+        } else {
+          // No session, no recognizable verification params.
+          throw new Error('No authentication parameters found. Invalid callback.');
         }
-        
-        // If we reach here and don't have parameters that would indicate a verification
-        // attempt, we're likely here by direct navigation, which we'll treat as an error
-        if (!searchParams.toString() && !hash) {
-          throw new Error('No verification parameters found');
-        }
-        
-        // Default to success for any other case where we have query parameters
-        // This is a fallback for any edge cases we haven't explicitly handled
-        setVerificationStatus('success');
       } catch (error: any) {
-        console.error('Verification error:', error);
+        console.error('Auth callback error:', error);
         setVerificationStatus('error');
-        setErrorMessage(error.message || 'An error occurred during verification');
+        setErrorMessage(error.message || 'An error occurred during authentication.');
       }
     };
 
-    handleEmailVerification();
-  }, [searchParams]);
+    handleAuthCallback();
+  }, [navigate, searchParams]);
 
   const handleContinue = () => {
     navigate('/login?verified=true');
@@ -110,6 +117,34 @@ const AuthCallback: React.FC = () => {
           </CardContent>
           <CardFooter className="flex justify-center">
             <Button onClick={handleTryAgain}>Try Again</Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+
+  if (verificationStatus === 'success') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
+        <Card className="max-w-md w-full">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center text-green-600">Authentication Successful!</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center text-center space-y-6 py-8">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-100">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">Process Complete</h3>
+              <p className="text-muted-foreground">
+                Your authentication process is complete. 
+                You will be redirected if successful, or you can proceed to login.
+              </p>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            {/* This button is mainly for email verification flows that don't auto-redirect to dashboard */}
+            <Button onClick={handleContinue}>Continue to Login</Button>
           </CardFooter>
         </Card>
       </div>

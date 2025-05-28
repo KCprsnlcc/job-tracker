@@ -3,6 +3,9 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { CheckCircle, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../lib/supabase';
+import GoogleIcon from '../components/icons/GoogleIcon';
+import FacebookIcon from '../components/icons/FacebookIcon';
 
 // Import shadcn/ui components
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
@@ -51,6 +54,25 @@ const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOAuthSignIn = async (provider: 'google' | 'facebook') => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin + '/auth/callback' // Ensure this matches your callback page route
+        }
+      });
+      if (error) throw error;
+      // Redirect happens via Supabase
+    } catch (err: any) {
+      setError(err.message || `Failed to sign in with ${provider}`);
+      setLoading(false);
+    }
+    // No need to setLoading(false) here if redirect occurs, but good for error case.
   };
 
   return (
@@ -185,7 +207,7 @@ const Login: React.FC = () => {
                   className="w-full relative overflow-hidden group" 
                   disabled={loading}
                 >
-                  {loading ? (
+                  {loading && !error ? (
                     <span className="flex items-center justify-center gap-2">
                       <motion.div
                         animate={{ rotate: 360 }}
@@ -199,18 +221,47 @@ const Login: React.FC = () => {
                       Signing in...
                     </span>
                   ) : (
-                    <span className="flex items-center justify-center">Sign in</span>
+                    'Sign In'
                   )}
-                  <motion.div 
-                    className="absolute inset-0 bg-white/20" 
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: "100%" }}
-                    transition={{ duration: 1, ease: "easeInOut" }}
-                  />
                 </Button>
               </motion.div>
             </motion.div>
           </form>
+
+          <motion.div 
+            className="relative my-6"
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            className="space-y-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.9 }}
+          >
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button variant="outline" className="w-full flex items-center justify-center gap-2" onClick={() => handleOAuthSignIn('google')} disabled={loading}>
+                <GoogleIcon className="h-5 w-5" /> 
+                Sign in with Google
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button variant="outline" className="w-full flex items-center justify-center gap-2" onClick={() => handleOAuthSignIn('facebook')} disabled={loading}>
+                <FacebookIcon className="h-5 w-5" />
+                Sign in with Facebook
+              </Button>
+            </motion.div>
+          </motion.div>
+
         </CardContent>
         
         <CardFooter className="flex flex-col items-center">
