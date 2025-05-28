@@ -32,7 +32,7 @@ const AuthCallback: React.FC = () => {
         
         // Check for hash parameters in URL that might indicate verification
         const hash = window.location.hash;
-        if (hash && hash.includes('type=recovery') || hash.includes('type=signup')) {
+        if (hash && (hash.includes('type=recovery') || hash.includes('type=signup'))) {
           setVerificationStatus('success');
           return;
         }

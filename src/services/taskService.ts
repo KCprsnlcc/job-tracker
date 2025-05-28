@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Task, TaskFormData } from '../types';
-import { TaskPriority, normalizePriority } from '../types/priority';
+import { normalizePriority } from '../types/priority';
 
 /**
  * Get all tasks for a user

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Task } from '../types';
 import { completeTask, deleteTask } from '../services/taskService';
 import { format } from 'date-fns';
-import { Check, X, Edit, Trash, AlertCircle } from 'lucide-react';
+import { Check, Edit, Trash, AlertCircle } from 'lucide-react';
 
 import {
   Table,

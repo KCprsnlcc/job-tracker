@@ -7,7 +7,7 @@ import JobTable from '../components/JobTable';
 import DeleteConfirmation from '../components/DeleteConfirmation';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { Search, Plus, LogOut, BarChart2, CheckSquare, Bell, ArrowRight } from 'lucide-react';
+import { Search, Plus, LogOut, BarChart2, CheckSquare, ArrowRight } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 

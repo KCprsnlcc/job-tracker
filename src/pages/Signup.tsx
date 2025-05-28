@@ -38,7 +38,7 @@ const Signup: React.FC = () => {
     try {
       setError(null);
       setLoading(true);
-      const { error, data, isConfirmed } = await signUp(email, password);
+      const { error, isConfirmed } = await signUp(email, password);
       
       if (error) throw error;
       

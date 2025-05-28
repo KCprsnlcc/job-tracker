@@ -1,4 +1,4 @@
-import { TaskPriority } from './priority';
+// Types index file
 
 export enum JobStatus {
   APPLIED = 'Applied',

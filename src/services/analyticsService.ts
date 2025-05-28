@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { AnalyticsData, JobStatus, Task } from '../types';
+import { AnalyticsData, JobStatus } from '../types';
 
 /**
  * Get analytics data for a user

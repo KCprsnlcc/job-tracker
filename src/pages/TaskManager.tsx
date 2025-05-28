@@ -6,7 +6,7 @@ import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { LogOut, CheckSquare, Plus, Clock, Filter, Check, ArrowLeft, RefreshCw } from 'lucide-react';
+import { LogOut, CheckSquare, Plus, Clock, Filter, Check, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';

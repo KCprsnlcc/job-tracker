@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Briefcase, CheckCircle, Clock, LineChart, ShieldCheck, ArrowRight } from 'lucide-react';
-import { motion, useScroll, useTransform, useInView, useAnimation, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, useAnimation } from 'framer-motion';
 
 const LandingPage: React.FC = () => {
   // For parallax scrolling effect on hero image
@@ -355,19 +355,6 @@ const AnimatedFeatureCard: React.FC<{
   );
 };
 
-// Original feature card kept for compatibility
-const FeatureCard: React.FC<{
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}> = ({ icon, title, description }) => {
-  return (
-    <Card className="p-6 flex flex-col items-center text-center space-y-3">
-      <div className="mb-2">{icon}</div>
-      <h3 className="text-xl font-medium">{title}</h3>
-      <p className="text-muted-foreground">{description}</p>
-    </Card>
-  );
-};
+
 
 export default LandingPage;

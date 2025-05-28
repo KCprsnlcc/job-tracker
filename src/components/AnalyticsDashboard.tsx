@@ -1,10 +1,10 @@
 import React from 'react';
 import { AnalyticsData, JobStatus } from '../types';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface AnalyticsDashboardProps {
   data: AnalyticsData;
@@ -23,15 +23,17 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ data }) => {
   };
   
   // Format task status data for pie chart
-  const taskStatusData = analyticsData.tasksByStatus 
-    ? Object.entries(analyticsData.tasksByStatus).map(([name, value], index) => ({
-        name,
-        y: value,
-        color: COLORS[index % COLORS.length],
-        sliced: index === 0,
-        selected: index === 0
-      }))
-    : [];
+  const taskStatusData = useMemo(() => {
+    return analyticsData.tasksByStatus 
+      ? Object.entries(analyticsData.tasksByStatus).map(([name, value], index) => ({
+          name,
+          y: value,
+          color: COLORS[index % COLORS.length],
+          sliced: index === 0,
+          selected: index === 0
+        }))
+      : [];
+  }, [analyticsData.tasksByStatus]);
 
   // Verify that task analytics data exists
   useEffect(() => {
