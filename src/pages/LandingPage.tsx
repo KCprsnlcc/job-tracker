@@ -57,6 +57,18 @@ const LandingPage: React.FC = () => {
             Job Tracker
           </motion.h1>
           <div className="flex items-center space-x-4">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="text-sm"
+            >
+              <Link
+                to="/privacy-policy"
+                className="text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                Privacy Policy
+              </Link>
+            </motion.div>
             <ThemeToggle />
             <div className="flex gap-2">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

@@ -459,22 +459,21 @@ const Signup: React.FC = () => {
 
         </CardContent>
         <CardFooter className="justify-center">
-          <motion.p 
-            className="text-sm text-muted-foreground mt-2"
+          <motion.div 
+            className="mt-4 text-center text-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.9 }}
           >
             Already have an account?{' '}
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              className="inline-block"
-            >
-              <Link to="/login" className="text-primary hover:underline">
-                Sign in
-              </Link>
-            </motion.span>
-          </motion.p>
+            <Link to="/login" className="font-medium text-primary hover:underline">
+              Sign in
+            </Link>
+            <br />
+            <Link to="/privacy-policy" className="text-xs text-muted-foreground hover:underline">
+              Privacy Policy
+            </Link>
+          </motion.div>
         </CardFooter>
         </Card>
       </motion.div>

@@ -9,6 +9,7 @@ import LandingPage from './pages/LandingPage';
 import AuthCallback from './pages/AuthCallback';
 import Analytics from './pages/Analytics';
 import TaskManager from './pages/TaskManager';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/toaster';
 import NavigationHandler from './components/NavigationHandler';
@@ -23,6 +24,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />

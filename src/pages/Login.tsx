@@ -268,22 +268,21 @@ const Login: React.FC = () => {
         </CardContent>
         
         <CardFooter className="flex flex-col items-center">
-          <motion.p 
-            className="text-sm text-muted-foreground mt-2"
+          <motion.div 
+            className="mt-4 text-center text-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
+            transition={{ duration: 0.5, delay: 0.9 }}
           >
             Don't have an account?{' '}
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              className="inline-block"
-            >
-              <Link to="/signup" className="text-primary hover:underline">
-                Sign up
-              </Link>
-            </motion.span>
-          </motion.p>
+            <Link to="/signup" className="font-medium text-primary hover:underline">
+              Sign up
+            </Link>
+            <br />
+            <Link to="/privacy-policy" className="text-xs text-muted-foreground hover:underline">
+              Privacy Policy
+            </Link>
+          </motion.div>
         </CardFooter>
       </Card>
       </motion.div>
