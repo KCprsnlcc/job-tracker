@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
             whileHover={{ color: "var(--primary)" }}
             transition={{ duration: 0.2 }}
           >
-            Job Tracker™ | Your Application Management Solution
+            Job Tracker | Your Application Management Solution
           </motion.span>
         </motion.div>
         <motion.div 
@@ -32,7 +32,7 @@ const Footer: React.FC = () => {
             className="font-medium"
             whileHover={{ color: "var(--primary)" }}
             transition={{ duration: 0.2 }}
-          >kcprsnlcc</motion.span>
+          >Khadaffe Sulaiman</motion.span>
         </motion.div>
       </div>
     </motion.footer>
