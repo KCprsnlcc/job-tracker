@@ -6,7 +6,7 @@ import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { LogOut, CheckSquare, Plus, Clock, Filter, Check, ArrowLeft, AlertCircle } from 'lucide-react';
+import { LogOut, CheckSquare, Plus, Clock, Filter, Check, ArrowLeft, AlertCircle, Search } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import { Input } from '../components/ui/input';
 
 const TaskManager: React.FC = () => {
   // For scroll-based animations
@@ -53,6 +54,7 @@ const TaskManager: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [filterType, setFilterType] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -106,7 +108,23 @@ const TaskManager: React.FC = () => {
     setFilterType(value);
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
   const filteredTasks = tasks.filter(task => {
+    // Search filtering
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = 
+      !searchTerm || 
+      task.title.toLowerCase().includes(searchLower) ||
+      (task.description && task.description.toLowerCase().includes(searchLower)) ||
+      (task.job_info && task.job_info.company.toLowerCase().includes(searchLower)) ||
+      (task.job_info && task.job_info.role.toLowerCase().includes(searchLower));
+    
+    if (!matchesSearch) return false;
+    
+    // Status filtering
     if (filterType === 'all') return true;
     if (filterType === 'completed') return task.completed;
     if (filterType === 'pending') return !task.completed;
@@ -246,6 +264,21 @@ const TaskManager: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <motion.div 
+              className="relative"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search tasks..."
+                className="pl-8 w-full sm:w-[200px] lg:w-[300px] transition-all duration-300 focus:ring-2 focus:ring-primary/50"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </motion.div>
+
+            <motion.div 
               className="relative flex items-center gap-2"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
@@ -334,15 +367,17 @@ const TaskManager: React.FC = () => {
 
         <motion.div
           variants={itemVariants}
+          layoutId="tabs-container"
         >
-          <Tabs defaultValue="all" className="mb-6">
+          <Tabs defaultValue={filterType} value={filterType} className="mb-6">
             <TabsList>
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                layout
               >
                 <TabsTrigger value="all" className="flex items-center gap-1" onClick={() => setFilterType('all')}>
-                  <motion.div whileHover={{ rotate: 15 }}>
+                  <motion.div whileHover={{ rotate: 15 }} layout>
                     <CheckSquare className="h-4 w-4" />
                   </motion.div>
                   All Tasks
@@ -351,9 +386,10 @@ const TaskManager: React.FC = () => {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                layout
               >
                 <TabsTrigger value="today" className="flex items-center gap-1" onClick={() => setFilterType('today')}>
-                  <motion.div whileHover={{ rotate: 15 }}>
+                  <motion.div whileHover={{ rotate: 15 }} layout>
                     <Clock className="h-4 w-4" />
                   </motion.div>
                   Due Today
@@ -362,9 +398,10 @@ const TaskManager: React.FC = () => {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                layout
               >
                 <TabsTrigger value="overdue" className="flex items-center gap-1" onClick={() => setFilterType('overdue')}>
-                  <motion.div whileHover={{ rotate: 15 }}>
+                  <motion.div whileHover={{ rotate: 15 }} layout>
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -375,9 +412,10 @@ const TaskManager: React.FC = () => {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                layout
               >
                 <TabsTrigger value="completed" className="flex items-center gap-1" onClick={() => setFilterType('completed')}>
-                  <motion.div whileHover={{ rotate: 15 }}>
+                  <motion.div whileHover={{ rotate: 15 }} layout>
                     <Check className="h-4 w-4" />
                   </motion.div>
                   Completed

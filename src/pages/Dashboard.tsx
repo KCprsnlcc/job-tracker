@@ -8,7 +8,7 @@ import DeleteConfirmation from '../components/DeleteConfirmation';
 import ExportDialog from '../components/ExportDialog';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { Search, Plus, LogOut, BarChart2, CheckSquare, ArrowRight, Download } from 'lucide-react';
+import { Search, Plus, LogOut, BarChart2, CheckSquare, ArrowRight, Download, Filter } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
@@ -17,6 +17,13 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Link } from 'react-router-dom';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
 
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -32,6 +39,7 @@ const Dashboard: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [jobToDelete, setJobToDelete] = useState<string | null>(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     if (user) {
@@ -126,14 +134,24 @@ const Dashboard: React.FC = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleFilterChange = (value: string) => {
+    setStatusFilter(value);
+  };
+
   const filteredJobs = jobs.filter(job => {
+    // Filter by search term
     const searchLower = searchTerm.toLowerCase();
-    return (
-      job.company.toLowerCase().includes(searchLower) ||
+    const matchesSearch = job.company.toLowerCase().includes(searchLower) ||
       job.role.toLowerCase().includes(searchLower) ||
       job.location.toLowerCase().includes(searchLower) ||
-      job.status.toLowerCase().includes(searchLower)
-    );
+      job.status.toLowerCase().includes(searchLower);
+    
+    // Filter by status
+    const matchesStatus = 
+      statusFilter === 'all' ||
+      job.status.toLowerCase() === statusFilter.toLowerCase();
+
+    return matchesSearch && matchesStatus;
   });
 
   const sortedJobs = [...filteredJobs].sort((a, b) => {
@@ -292,46 +310,48 @@ const Dashboard: React.FC = () => {
               />
             </motion.div>
 
-            <div className="flex space-x-2">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+            <motion.div 
+              className="relative flex items-center gap-2"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Select
+                value={statusFilter}
+                onValueChange={handleFilterChange}
               >
-                <Button
-                  variant="outline"
-                  onClick={() => setExportDialogOpen(true)}
-                  className="flex items-center gap-1 relative overflow-hidden"
-                >
-                  <Download className="h-4 w-4" />
-                  <span>Export</span>
-                  <motion.div 
-                    className="absolute inset-0 bg-primary/10" 
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: "100%" }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                  />
-                </Button>
-              </motion.div>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="applied">Applied</SelectItem>
+                  <SelectItem value="interview">Interview</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                  <SelectItem value="offer">Offer</SelectItem>
+                  <SelectItem value="accepted">Accepted</SelectItem>
+                </SelectContent>
+              </Select>
+            </motion.div>
 
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button
+                onClick={handleAddJob}
+                className="flex items-center gap-1 relative overflow-hidden"
               >
-                <Button
-                  onClick={handleAddJob}
-                  className="flex items-center gap-1 relative overflow-hidden"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Add Job</span>
-                  <motion.div 
-                    className="absolute inset-0 bg-white/20" 
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: "100%" }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                  />
-                </Button>
-              </motion.div>
-            </div>
+                <Plus className="h-4 w-4" />
+                <span>Add Job</span>
+                <motion.div 
+                  className="absolute inset-0 bg-white/20" 
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                />
+              </Button>
+            </motion.div>
           </motion.div>
         </motion.div>
 

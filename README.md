@@ -37,6 +37,13 @@ A modern web application built with React, TypeScript, and Supabase to help user
   - Response rate tracking
   - Average response time metrics
 
+- **Data Export**
+  - Export job application data in multiple formats (JSON, CSV, XML, PDF)
+  - Filter exports by date range, status, company, and more
+  - Include notes and tasks in exports
+  - Schedule automated exports (daily, weekly, or monthly)
+  - Instantly download data or receive scheduled exports
+
 - **Modern UI**
   - Sleek, responsive interface built with Tailwind CSS and shadcn/ui components
   - Enhanced with smooth animations and interactive elements using Framer Motion
