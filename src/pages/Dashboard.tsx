@@ -497,7 +497,7 @@ const Dashboard: React.FC = () => {
               </CardHeader>
               <CardContent className="pb-3 text-sm">
                 <p>
-                  Export your job application data in multiple formats (JSON, CSV, XML, PDF). Filter by date, status, or company and schedule periodic exports to track trends over time.
+                  Export your job application data in multiple formats. Filter by date, status, or company and schedule periodic exports to track trends over time.
                 </p>
               </CardContent>
               <CardFooter>
