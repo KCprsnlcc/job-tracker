@@ -136,17 +136,7 @@ const TaskList: React.FC<TaskListProps> = ({
   }
 
   if (tasks.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-          <AlertCircle className="h-8 w-8 text-muted-foreground" />
-        </div>
-        <h3 className="text-lg font-medium">No tasks found</h3>
-        <p className="text-muted-foreground mt-2">
-          You don't have any tasks yet. Add a new task to get started.
-        </p>
-      </div>
-    );
+    return null; // Removing duplicate "No tasks found" message that's shown in TaskManager
   }
 
   return (

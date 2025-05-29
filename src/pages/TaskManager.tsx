@@ -6,7 +6,7 @@ import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { LogOut, CheckSquare, Plus, Clock, Filter, Check, ArrowLeft } from 'lucide-react';
+import { LogOut, CheckSquare, Plus, Clock, Filter, Check, ArrowLeft, AlertCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
@@ -222,7 +222,7 @@ const TaskManager: React.FC = () => {
             >
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ scale: 1, rotate: [0, 0, 360] }}
+                animate={{ scale: 1, rotate: 360 }}
                 transition={{ duration: 0.5 }}
               >
                 <CheckSquare className="h-5 w-5 text-primary" />
@@ -315,7 +315,7 @@ const TaskManager: React.FC = () => {
                   <motion.div 
                     className="flex-shrink-0"
                     initial={{ scale: 0 }}
-                    animate={{ scale: 1, rotate: [0, 0, 360] }}
+                    animate={{ scale: 1, rotate: 360 }}
                     transition={{ duration: 0.5 }}
                   >
                     <svg className="h-5 w-5 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -431,11 +431,11 @@ const TaskManager: React.FC = () => {
                 >
                   <motion.div
                     initial={{ scale: 0 }}
-                    animate={{ scale: 1, rotate: [0, 10, 0] }}
+                    animate={{ scale: 1, rotate: 10 }}
                     transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
                     className="mb-4"
                   >
-                    <CheckSquare className="h-12 w-12 mx-auto text-muted-foreground" />
+                    <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground" />
                   </motion.div>
                   <motion.h3 
                     className="text-lg font-medium"
@@ -451,7 +451,7 @@ const TaskManager: React.FC = () => {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5, delay: 0.4 }}
                   >
-                    Create a new task to get started
+                    You don't have any tasks yet. Add a new task to get started.
                   </motion.p>
                   <motion.div 
                     className="mt-4"
@@ -461,19 +461,7 @@ const TaskManager: React.FC = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <Button 
-                      onClick={handleAddTask}
-                      className="flex items-center gap-2 relative overflow-hidden"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Add New Task</span>
-                      <motion.div 
-                        className="absolute inset-0 bg-white/20" 
-                        initial={{ x: "-100%" }}
-                        whileHover={{ x: "100%" }}
-                        transition={{ duration: 0.8, ease: "easeInOut" }}
-                      />
-                    </Button>
+
                   </motion.div>
                 </motion.div>
               )}
