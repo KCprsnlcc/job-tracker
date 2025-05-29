@@ -88,14 +88,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     console.log('AuthContext: signOut method called');
     try {
+      // First clear local session state
+      setSession(null);
+      setUser(null);
+      
+      // Then attempt to sign out from Supabase
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('AuthContext: Supabase signout error:', error);
+        // Even if there's an error, we can still force cleanup locally
+        localStorage.removeItem('supabase.auth.token');
+        localStorage.removeItem('job-tracker-auth');
       } else {
         console.log('AuthContext: Supabase signout successful, auth state should change.');
       }
     } catch (e) {
       console.error('AuthContext: Error during signOut process:', e);
+      // Ensure we still clear the session state on error
+      setSession(null);
+      setUser(null);
     }
   };
 
