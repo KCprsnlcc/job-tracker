@@ -45,6 +45,12 @@ A modern web application built with React, TypeScript, and Supabase to help user
   - Status indicators with color coding
   - Beautiful and accessible UI components
 
+- **Privacy and Support**
+  - Detailed Privacy Policy page with comprehensive information on data handling and user rights
+  - Contact page with form submission functionality for user inquiries and support
+  - FAQ section addressing common questions about the application
+  - Clear information about the application's free usage with no subscription plans
+
 ## Tech Stack
 
 - **Frontend**: React + TypeScript
