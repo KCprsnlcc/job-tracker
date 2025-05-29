@@ -165,8 +165,11 @@ const Analytics: React.FC = () => {
             >
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ scale: 1, rotate: [0, 0, 360] }}
-                transition={{ duration: 0.5 }}
+                animate={{ scale: 1, rotate: [0, 10, 0] }}
+                transition={{ 
+                  scale: { type: "spring", stiffness: 260, damping: 20 },
+                  rotate: { duration: 1.5, ease: "easeInOut", times: [0, 0.5, 1] }
+                }}
               >
                 <BarChart2 className="h-5 w-5 text-primary" />
               </motion.div>
@@ -295,7 +298,10 @@ const Analytics: React.FC = () => {
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1, rotate: [0, 10, 0] }}
-                transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
+                transition={{ 
+                  scale: { type: "spring", stiffness: 260, damping: 20 },
+                  rotate: { duration: 1.5, ease: "easeInOut", times: [0, 0.5, 1] }
+                }}
                 className="mb-4"
               >
                 <BarChart2 className="h-12 w-12 mx-auto text-muted-foreground" />

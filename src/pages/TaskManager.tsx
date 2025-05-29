@@ -454,14 +454,26 @@ const TaskManager: React.FC = () => {
                     You don't have any tasks yet. Add a new task to get started.
                   </motion.p>
                   <motion.div 
-                    className="mt-4"
+                    className="mt-4 flex justify-center"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.5 }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-
+                    <Button 
+                      onClick={handleAddTask}
+                      className="relative overflow-hidden flex items-center gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Create Task
+                      <motion.div 
+                        className="absolute inset-0 bg-white/20" 
+                        initial={{ x: "-100%" }}
+                        whileHover={{ x: "100%" }}
+                        transition={{ duration: 0.8, ease: "easeInOut" }}
+                      />
+                    </Button>
                   </motion.div>
                 </motion.div>
               )}
