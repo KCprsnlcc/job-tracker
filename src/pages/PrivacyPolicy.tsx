@@ -278,7 +278,7 @@ const PrivacyPolicy: React.FC = () => {
             We may update this privacy policy from time to time. The updated version will be indicated by an updated "Last updated" date and the updated version will be effective as soon as it is accessible. If we make material changes to this privacy policy, we may notify you either by prominently posting a notice of such changes or by directly sending you a notification. We encourage you to review this privacy policy frequently to be informed of how we are protecting your information.
           </p>
           <p className="mt-2 text-sm">
-            <em>Last updated: [Specify Date - e.g., May 29, 2025]</em>
+            <em>Last updated: [May 29, 2025]</em>
           </p>
         </Section>
 
