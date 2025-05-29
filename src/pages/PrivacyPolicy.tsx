@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
-import { ShieldCheck, FileText, DatabaseZap, Cookie, Link2, Users, Mail, Info, Clock, FileLock, Edit3, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, FileText, DatabaseZap, Cookie, Link2, Users, Mail, Info, Clock, FileLock, Edit3 } from 'lucide-react';
 import Footer from '../components/Footer'; // Assuming you have a Footer component
 import { ThemeToggle } from '../components/theme-toggle'; // Added for global header
 import { Button } from '../components/ui/button'; // Added for global header

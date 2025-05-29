@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Mail, RefreshCw, UserPlus, ArrowRight } from 'lucide-react';
+import { Mail, RefreshCw, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import GoogleIcon from '../components/icons/GoogleIcon';
