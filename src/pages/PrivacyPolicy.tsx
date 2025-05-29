@@ -84,7 +84,9 @@ const PrivacyPolicy: React.FC = () => {
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
             />
-            Job Tracker
+            <Link to="/" className="text-foreground hover:text-primary transition-colors">
+              Job Tracker
+            </Link>
           </motion.h1>
           <div className="flex items-center space-x-4">
             <motion.div
@@ -97,6 +99,18 @@ const PrivacyPolicy: React.FC = () => {
                 className="text-muted-foreground hover:text-primary transition-colors duration-200"
               >
                 Privacy Policy
+              </Link>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="text-sm hidden md:block" // Hide on small screens if needed
+            >
+              <Link
+                to="/contact"
+                className="text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                Contact
               </Link>
             </motion.div>
             <ThemeToggle />

@@ -69,6 +69,18 @@ const LandingPage: React.FC = () => {
                 Privacy Policy
               </Link>
             </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="text-sm"
+            >
+              <Link
+                to="/contact"
+                className="text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                Contact
+              </Link>
+            </motion.div>
             <ThemeToggle />
             <div className="flex gap-2">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

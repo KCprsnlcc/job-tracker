@@ -10,6 +10,7 @@ import AuthCallback from './pages/AuthCallback';
 import Analytics from './pages/Analytics';
 import TaskManager from './pages/TaskManager';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Contact from './pages/Contact';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/toaster';
 import NavigationHandler from './components/NavigationHandler';
@@ -25,6 +26,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
