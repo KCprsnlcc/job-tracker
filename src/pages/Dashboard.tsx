@@ -5,9 +5,10 @@ import { Job, SortField, SortDirection } from '../types';
 import JobForm from '../components/JobForm';
 import JobTable from '../components/JobTable';
 import DeleteConfirmation from '../components/DeleteConfirmation';
+import ExportDialog from '../components/ExportDialog';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { Search, Plus, LogOut, BarChart2, CheckSquare, ArrowRight } from 'lucide-react';
+import { Search, Plus, LogOut, BarChart2, CheckSquare, ArrowRight, Download } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
@@ -30,6 +31,7 @@ const Dashboard: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [jobToDelete, setJobToDelete] = useState<string | null>(null);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -290,24 +292,46 @@ const Dashboard: React.FC = () => {
               />
             </motion.div>
 
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button
-                onClick={handleAddJob}
-                className="flex items-center gap-1 relative overflow-hidden"
+            <div className="flex space-x-2">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Plus className="h-4 w-4" />
-                <span>Add Job</span>
-                <motion.div 
-                  className="absolute inset-0 bg-white/20" 
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                />
-              </Button>
-            </motion.div>
+                <Button
+                  variant="outline"
+                  onClick={() => setExportDialogOpen(true)}
+                  className="flex items-center gap-1 relative overflow-hidden"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Export</span>
+                  <motion.div 
+                    className="absolute inset-0 bg-primary/10" 
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: "100%" }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                  />
+                </Button>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  onClick={handleAddJob}
+                  className="flex items-center gap-1 relative overflow-hidden"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Add Job</span>
+                  <motion.div 
+                    className="absolute inset-0 bg-white/20" 
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: "100%" }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                  />
+                </Button>
+              </motion.div>
+            </div>
           </motion.div>
         </motion.div>
 
@@ -343,7 +367,7 @@ const Dashboard: React.FC = () => {
 
         {/* Feature Cards */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
           variants={itemVariants}
         >
           {/* Analytics Card */}
@@ -451,6 +475,62 @@ const Dashboard: React.FC = () => {
               </CardFooter>
             </Card>
           </motion.div>
+
+          {/* Export Data Card */}
+          <motion.div
+            whileHover={{ scale: 1.02, y: -5 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          >
+            <Card className="overflow-hidden h-full">
+              <CardHeader className="pb-3 flex flex-row items-center gap-2">
+                <motion.div 
+                  className="bg-primary/10 p-2 rounded-full"
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <Download className="h-6 w-6 text-primary" />
+                </motion.div>
+                <div>
+                  <CardTitle>Data Export</CardTitle>
+                  <CardDescription>Take your data anywhere</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="pb-3 text-sm">
+                <p>
+                  Export your job application data in multiple formats (JSON, CSV, XML, PDF). Filter by date, status, or company and schedule periodic exports to track trends over time.
+                </p>
+              </CardContent>
+              <CardFooter>
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full"
+                >
+                  <Button 
+                    className="w-full relative overflow-hidden"
+                    onClick={() => setExportDialogOpen(true)}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <Download className="h-4 w-4" />
+                      <span>Export Data</span>
+                      <motion.div 
+                        animate={{ y: [0, -5, 0] }} 
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </motion.div>
+                    </span>
+                    <motion.div 
+                      className="absolute inset-0 bg-primary/10" 
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.8, ease: "easeInOut" }}
+                    />
+                  </Button>
+                </motion.div>
+              </CardFooter>
+            </Card>
+          </motion.div>
         </motion.div>
 
         <AnimatePresence mode="wait">
@@ -502,6 +582,11 @@ const Dashboard: React.FC = () => {
         isOpen={deleteDialogOpen}
         onClose={closeDeleteDialog}
         onConfirm={confirmDeleteJob}
+      />
+      
+      <ExportDialog
+        isOpen={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
       />
       
       <Footer />

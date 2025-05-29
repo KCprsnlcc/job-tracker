@@ -9,106 +9,113 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      jobs: {
+      applications: {
         Row: {
           id: string
           user_id: string
           company: string
-          role: string
+          position: string
           date_applied: string
-          location: string
-          link: string | null
           status: string
-          notes: string | null
+          url?: string
+          location?: string
+          salary_range?: string
+          contact_name?: string
+          contact_email?: string
+          contact_phone?: string
           created_at: string
           updated_at: string
+          notes?: string
         }
         Insert: {
           id?: string
           user_id: string
           company: string
-          role: string
+          position: string
           date_applied: string
-          location: string
-          link?: string | null
           status: string
-          notes?: string | null
+          url?: string
+          location?: string
+          salary_range?: string
+          contact_name?: string
+          contact_email?: string
+          contact_phone?: string
           created_at?: string
           updated_at?: string
+          notes?: string
         }
         Update: {
           id?: string
           user_id?: string
           company?: string
-          role?: string
+          position?: string
           date_applied?: string
-          location?: string
-          link?: string | null
           status?: string
-          notes?: string | null
+          url?: string
+          location?: string
+          salary_range?: string
+          contact_name?: string
+          contact_email?: string
+          contact_phone?: string
           created_at?: string
           updated_at?: string
+          notes?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "jobs_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
       }
       tasks: {
         Row: {
           id: string
-          user_id: string
-          job_id: string | null
-          title: string
-          description: string | null
+          application_id: string
+          description: string
           due_date: string
-          completed: boolean
-          priority: string
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          application_id: string
+          description: string
+          due_date: string
+          status: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          application_id?: string
+          description?: string
+          due_date?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      profiles: {
+        Row: {
+          id: string
+          user_id: string
+          full_name?: string
+          email: string
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          job_id?: string | null
-          title: string
-          description?: string | null
-          due_date: string
-          completed: boolean
-          priority: string
+          full_name?: string
+          email: string
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           user_id?: string
-          job_id?: string | null
-          title?: string
-          description?: string | null
-          due_date?: string
-          completed?: boolean
-          priority?: string
+          full_name?: string
+          email?: string
           created_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "tasks_job_id_fkey"
-            columns: ["job_id"]
-            referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tasks_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
       }
     }
     Views: {
@@ -118,9 +125,6 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
       [_ in never]: never
     }
   }
