@@ -12,6 +12,7 @@ import {
   TableRow,
 } from './ui/table';
 import { Card } from './ui/card';
+import { motion } from 'framer-motion';
 
 interface JobTableProps {
   jobs: Job[];
@@ -89,142 +90,249 @@ const JobTable: React.FC<JobTableProps> = ({
     });
   };
 
+  // Mobile card view for jobs
+  const renderMobileJobCards = () => {
+    return jobs.map((job) => (
+      <motion.div
+        key={job.id}
+        className="mb-4 last:mb-0"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Card className="p-4 shadow-sm">
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <h3 className="font-medium text-base">{job.company}</h3>
+              <p className="text-sm text-muted-foreground">{job.role}</p>
+            </div>
+            <Badge variant="outline" className={`${getStatusStyle(job.status)} flex items-center justify-center gap-1 px-2 py-0.5 text-xs`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(job.status)}`}></span>
+              {job.status}
+            </Badge>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+            <div>
+              <span className="text-muted-foreground">Date: </span>
+              {formatDate(job.date_applied)}
+            </div>
+            <div>
+              <span className="text-muted-foreground">Location: </span>
+              {job.location}
+            </div>
+          </div>
+          
+          <div className="flex justify-between items-center pt-2 border-t border-border">
+            {job.link ? (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="p-0 h-auto text-blue-600 hover:text-blue-900"
+                asChild
+              >
+                <a
+                  href={job.link.startsWith('http') ? job.link : `https://${job.link}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  <span>View</span>
+                </a>
+              </Button>
+            ) : (
+              <span className="text-muted-foreground text-xs">No link</span>
+            )}
+            
+            <div className="flex space-x-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onEdit(job)}
+                className="h-8 w-8 p-0"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                <span className="sr-only">Edit</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDelete(job.id!)}
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive/90"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span className="sr-only">Delete</span>
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    ));
+  };
+
   return (
     <Card className="bg-card">
-      <div className="overflow-x-auto">
-        {jobs.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="mx-auto h-12 w-12 text-muted-foreground">
-              <svg
-                className="h-12 w-12"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <h3 className="mt-2 text-sm font-medium">No job applications</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Get started by adding a new job application.</p>
+      {jobs.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="mx-auto h-12 w-12 text-muted-foreground">
+            <svg
+              className="h-12 w-12"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
           </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead 
-                  className="cursor-pointer"
-                  onClick={() => onSort('company')}
-                >
-                  <div className="flex items-center">
-                    Company
-                    {renderSortIcon('company')}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="cursor-pointer"
-                  onClick={() => onSort('role')}
-                >
-                  <div className="flex items-center">
-                    Role
-                    {renderSortIcon('role')}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="cursor-pointer"
-                  onClick={() => onSort('date_applied')}
-                >
-                  <div className="flex items-center">
-                    Date Applied
-                    {renderSortIcon('date_applied')}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="cursor-pointer"
-                  onClick={() => onSort('location')}
-                >
-                  <div className="flex items-center">
-                    Location
-                    {renderSortIcon('location')}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="cursor-pointer"
-                  onClick={() => onSort('status')}
-                >
-                  <div className="flex items-center">
-                    Status
-                    {renderSortIcon('status')}
-                  </div>
-                </TableHead>
-                <TableHead>Link</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {jobs.map((job) => (
-                <TableRow key={job.id}>
-                  <TableCell className="font-medium">{job.company}</TableCell>
-                  <TableCell>{job.role}</TableCell>
-                  <TableCell>{formatDate(job.date_applied)}</TableCell>
-                  <TableCell>{job.location}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`${getStatusStyle(job.status)} flex items-center justify-center gap-1 px-2 py-0.5 text-xs max-w-[110px]`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(job.status)}`}></span>
-                      {job.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {job.link ? (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="p-0 h-auto text-blue-600 hover:text-blue-900"
-                        asChild
-                      >
-                        <a
-                          href={job.link.startsWith('http') ? job.link : `https://${job.link}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          <span>View</span>
-                        </a>
-                      </Button>
-                    ) : (
-                      <span className="text-muted-foreground">N/A</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => onEdit(job)}
-                      className="h-8 w-8 p-0 text-blue-600 hover:text-blue-900"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost" 
-                      size="icon"
-                      onClick={() => onDelete(job.id!)}
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive/80"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+          <h3 className="mt-2 text-sm font-medium">No job applications</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Get started by adding a new job application.</p>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table View - Hidden on Mobile */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead 
+                    className="cursor-pointer"
+                    onClick={() => onSort('company')}
+                  >
+                    <div className="flex items-center">
+                      Company
+                      {renderSortIcon('company')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer"
+                    onClick={() => onSort('role')}
+                  >
+                    <div className="flex items-center">
+                      Role
+                      {renderSortIcon('role')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer"
+                    onClick={() => onSort('date_applied')}
+                  >
+                    <div className="flex items-center">
+                      Date Applied
+                      {renderSortIcon('date_applied')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer"
+                    onClick={() => onSort('location')}
+                  >
+                    <div className="flex items-center">
+                      Location
+                      {renderSortIcon('location')}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer"
+                    onClick={() => onSort('status')}
+                  >
+                    <div className="flex items-center">
+                      Status
+                      {renderSortIcon('status')}
+                    </div>
+                  </TableHead>
+                  <TableHead>Link</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </div>
+              </TableHeader>
+              <TableBody>
+                {jobs.map((job) => (
+                  <TableRow key={job.id}>
+                    <TableCell className="font-medium">{job.company}</TableCell>
+                    <TableCell>{job.role}</TableCell>
+                    <TableCell>{formatDate(job.date_applied)}</TableCell>
+                    <TableCell>{job.location}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={`${getStatusStyle(job.status)} flex items-center justify-center gap-1 px-2 py-0.5 text-xs max-w-[110px]`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(job.status)}`}></span>
+                        {job.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {job.link ? (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="p-0 h-auto text-blue-600 hover:text-blue-900"
+                          asChild
+                        >
+                          <a
+                            href={job.link.startsWith('http') ? job.link : `https://${job.link}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            <span>View</span>
+                          </a>
+                        </Button>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEdit(job)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onDelete(job.id!)}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive/90"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span className="sr-only">Delete</span>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          
+          {/* Mobile Card View - Shown only on Mobile */}
+          <div className="md:hidden p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium">Job Applications</h2>
+              <div className="flex items-center space-x-2 text-sm">
+                <button 
+                  onClick={() => onSort('date_applied')} 
+                  className="flex items-center text-muted-foreground"
+                >
+                  <span>Sort by Date</span>
+                  {sortField === 'date_applied' && (
+                    sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+            {renderMobileJobCards()}
+          </div>
+        </>
+      )}
     </Card>
   );
 };

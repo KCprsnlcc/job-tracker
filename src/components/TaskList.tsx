@@ -3,6 +3,7 @@ import { Task } from '../types';
 import { completeTask, deleteTask } from '../services/taskService';
 import { format } from 'date-fns';
 import { Check, Edit, Trash, AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import {
   Table,
@@ -15,6 +16,7 @@ import {
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { Badge } from './ui/badge';
+import { Card } from './ui/card';
 import DeleteConfirmation from './DeleteConfirmation';
 import { useToast } from '../hooks/use-toast';
 
@@ -126,6 +128,86 @@ const TaskList: React.FC<TaskListProps> = ({
     
     return '';
   };
+  
+  // Render task cards for mobile view
+  const renderMobileTaskCards = () => {
+    return tasks.map((task) => (
+      <motion.div 
+        key={task.id}
+        className="mb-4 last:mb-0"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Card className={`p-4 shadow-sm ${task.completed ? 'bg-muted/50' : ''}`}>
+          <div className="flex items-start gap-3">
+            <div className="pt-0.5">
+              <Checkbox
+                checked={task.completed}
+                onCheckedChange={() => handleComplete(task)}
+              />
+            </div>
+            <div className="flex-1">
+              <div className="flex flex-col">
+                <h3 className={`font-medium text-base ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                  {task.title}
+                </h3>
+                {task.description && (
+                  <p className={`text-sm ${task.completed ? 'line-through text-muted-foreground' : 'text-muted-foreground'} mt-1`}>
+                    {task.description}
+                  </p>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2 text-sm mt-3">
+                {showJobInfo && task.job_id && task.job_info && (
+                  <div className="col-span-2">
+                    <span className="text-muted-foreground">Job: </span>
+                    <span className="font-medium">{task.job_info.company}</span>
+                    {task.job_info.role && (
+                      <span className="text-xs text-muted-foreground ml-1">({task.job_info.role})</span>
+                    )}
+                  </div>
+                )}
+                <div>
+                  <Badge variant="outline" className={`${getPriorityColor(task.priority)} flex items-center justify-center gap-1 px-2 py-0.5 text-xs`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${task.priority.toLowerCase() === 'high' ? 'bg-red-500 dark:bg-red-400' : task.priority.toLowerCase() === 'medium' ? 'bg-yellow-500 dark:bg-yellow-400' : 'bg-green-500 dark:bg-green-400'}`}></span>
+                    {task.priority}
+                  </Badge>
+                </div>
+                <div className={getDueDateColor(task.due_date)}>
+                  {format(new Date(task.due_date), 'MMM d, yyyy')}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col space-y-2">
+              {!task.completed && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(task)}
+                  className="h-8 w-8 p-0"
+                >
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="sr-only">Edit</span>
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => openDeleteDialog(task.id!)}
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive/90"
+              >
+                <Trash className="h-3.5 w-3.5" />
+                <span className="sr-only">Delete</span>
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    ));
+  };
 
   if (loading) {
     return (
@@ -141,7 +223,8 @@ const TaskList: React.FC<TaskListProps> = ({
 
   return (
     <>
-      <div className="rounded-md border">
+      {/* Desktop Table View - Hidden on Mobile */}
+      <div className="hidden md:block rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -199,25 +282,22 @@ const TaskList: React.FC<TaskListProps> = ({
                     {!task.completed && (
                       <Button
                         variant="ghost"
-                        size="icon"
-                        onClick={() => handleComplete(task)}
+                        size="sm"
+                        onClick={() => onEdit(task)}
+                        className="h-8 w-8 p-0"
                       >
-                        <Check className="h-4 w-4" />
+                        <Edit className="h-3.5 w-3.5" />
+                        <span className="sr-only">Edit</span>
                       </Button>
                     )}
                     <Button
                       variant="ghost"
-                      size="icon"
-                      onClick={() => onEdit(task)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => openDeleteDialog(task.id!)}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive/90"
                     >
-                      <Trash className="h-4 w-4" />
+                      <Trash className="h-3.5 w-3.5" />
+                      <span className="sr-only">Delete</span>
                     </Button>
                   </div>
                 </TableCell>
@@ -225,6 +305,16 @@ const TaskList: React.FC<TaskListProps> = ({
             ))}
           </TableBody>
         </Table>
+      </div>
+      
+      {/* Mobile Card View - Shown only on Mobile */}
+      <div className="md:hidden">
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-medium">Tasks</h2>
+          </div>
+          {renderMobileTaskCards()}
+        </div>
       </div>
 
       <DeleteConfirmation
