@@ -161,7 +161,7 @@ const Contact: React.FC = () => {
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
             />
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">
+            <Link to="/" className="text-primary hover:text-primary/80 transition-colors">
               Job Tracker
             </Link>
           </motion.h1>

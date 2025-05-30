@@ -237,7 +237,7 @@ const Dashboard: React.FC = () => {
       transition={{ duration: 0.5 }}
     >
       <motion.header 
-        className="bg-card border-b border-border sticky top-0 z-10"
+        className="bg-card border-b border-border sticky top-0 z-50"
         style={{ opacity: headerOpacity }}
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -245,20 +245,22 @@ const Dashboard: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <motion.h1 
-            className="text-xl sm:text-2xl font-bold flex items-center gap-2"
-            whileHover={{ scale: 1.03 }}
+            className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-primary"
+            whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <motion.img 
-              src="/favicon.ico" 
-              alt="Job Tracker" 
-              className="w-5 h-5 sm:w-6 sm:h-6" 
-              initial={{ rotate: 0 }}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, delay: 0.5 }}
-            />
-            <span className="hidden sm:inline">Job Tracker</span>
-            <span className="sm:hidden">JT</span>
+            <Link to="/" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
+              <motion.img 
+                src="/favicon.ico" 
+                alt="Job Tracker" 
+                className="w-5 h-5 sm:w-6 sm:h-6" 
+                initial={{ rotate: 0 }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
+              />
+              <span className="hidden sm:inline">Job Tracker</span>
+              <span className="sm:hidden">Job Tracker</span>
+            </Link>
           </motion.h1>
           
           {/* Desktop Navigation */}
@@ -540,10 +542,10 @@ const Dashboard: React.FC = () => {
         >
           {/* Analytics Card */}
           <motion.div
-            whileHover={{ scale: 1.02, y: -5 }}
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
           >
-            <Card className="overflow-hidden h-full">
+            <Card className="overflow-hidden h-full hover:shadow-md transition-all duration-300 border-primary/10">
               <CardHeader className="pb-3 flex flex-row items-center gap-2">
                 <motion.div 
                   className="bg-primary/10 p-2 rounded-full"
@@ -579,7 +581,7 @@ const Dashboard: React.FC = () => {
                         <ArrowRight className="h-4 w-4" />
                       </motion.div>
                       <motion.div 
-                        className="absolute inset-0 bg-primary/10" 
+                        className="absolute inset-0 bg-white/20" 
                         initial={{ x: "-100%" }}
                         whileHover={{ x: "100%" }}
                         transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -593,10 +595,10 @@ const Dashboard: React.FC = () => {
 
           {/* Task Management Card */}
           <motion.div
-            whileHover={{ scale: 1.02, y: -5 }}
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
           >
-            <Card className="overflow-hidden h-full">
+            <Card className="overflow-hidden h-full hover:shadow-md transition-all duration-300 border-primary/10">
               <CardHeader className="pb-3 flex flex-row items-center gap-2">
                 <motion.div 
                   className="bg-primary/10 p-2 rounded-full"
@@ -632,7 +634,7 @@ const Dashboard: React.FC = () => {
                         <ArrowRight className="h-4 w-4" />
                       </motion.div>
                       <motion.div 
-                        className="absolute inset-0 bg-primary/10" 
+                        className="absolute inset-0 bg-white/20" 
                         initial={{ x: "-100%" }}
                         whileHover={{ x: "100%" }}
                         transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -646,10 +648,10 @@ const Dashboard: React.FC = () => {
 
           {/* Export Data Card */}
           <motion.div
-            whileHover={{ scale: 1.02, y: -5 }}
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
           >
-            <Card className="overflow-hidden h-full">
+            <Card className="overflow-hidden h-full hover:shadow-md transition-all duration-300 border-primary/10">
               <CardHeader className="pb-3 flex flex-row items-center gap-2">
                 <motion.div 
                   className="bg-primary/10 p-2 rounded-full"
@@ -689,7 +691,7 @@ const Dashboard: React.FC = () => {
                       </motion.div>
                     </span>
                     <motion.div 
-                      className="absolute inset-0 bg-primary/10" 
+                      className="absolute inset-0 bg-white/20" 
                       initial={{ x: "-100%" }}
                       whileHover={{ x: "100%" }}
                       transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -726,14 +728,19 @@ const Dashboard: React.FC = () => {
               transition={{ duration: 0.5 }}
               variants={itemVariants}
             >
-              <JobTable
-                jobs={sortedJobs}
-                onEdit={handleEditJob}
-                onDelete={handleDeleteJob}
-                sortField={sortField}
-                sortDirection={sortDirection}
-                onSort={handleSort}
-              />
+              <motion.div 
+                className="mt-8 bg-card hover:shadow-md transition-all duration-300 border-primary/10 rounded-md overflow-hidden"
+                variants={itemVariants}
+              >
+                <JobTable
+                  jobs={sortedJobs}
+                  onEdit={handleEditJob}
+                  onDelete={handleDeleteJob}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

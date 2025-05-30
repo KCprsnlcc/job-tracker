@@ -48,21 +48,20 @@ const LandingPage: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <motion.h1 
-            className="text-2xl font-bold flex items-center gap-2"
+            className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-primary"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             <motion.img 
               src="/favicon.ico" 
               alt="Job Tracker" 
-              className="w-6 h-6" 
+              className="w-5 h-5 sm:w-6 sm:h-6" 
               initial={{ rotate: 0 }}
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
             />
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">
-              Job Tracker
-            </Link>
+            <span className="hidden sm:inline">Job Tracker</span>
+            <span className="sm:hidden">Job Tracker</span>
           </motion.h1>
           
           {/* Desktop Navigation */}

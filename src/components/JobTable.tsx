@@ -91,16 +91,17 @@ const JobTable: React.FC<JobTableProps> = ({
   };
 
   // Mobile card view for jobs
-  const renderMobileJobCards = () => {
-    return jobs.map((job) => (
-      <motion.div
+  const renderJobCards = () => {
+    return jobs.map((job, index) => (
+      <motion.div 
         key={job.id}
         className="mb-4 last:mb-0"
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: 0.5, delay: index * 0.05 }}
+        whileHover={{ y: -5, transition: { duration: 0.2 } }}
       >
-        <Card className="p-4 shadow-sm">
+        <Card className="p-4 hover:shadow-md transition-all duration-300 border-primary/10">
           <div className="flex justify-between items-start mb-3">
             <div>
               <h3 className="font-medium text-base">{job.company}</h3>
@@ -172,7 +173,7 @@ const JobTable: React.FC<JobTableProps> = ({
   };
 
   return (
-    <Card className="bg-card">
+    <Card className="bg-card hover:shadow-md transition-all duration-300 border-primary/10 overflow-hidden">
       {jobs.length === 0 ? (
         <div className="text-center py-12">
           <div className="mx-auto h-12 w-12 text-muted-foreground">
@@ -329,7 +330,7 @@ const JobTable: React.FC<JobTableProps> = ({
                 </button>
               </div>
             </div>
-            {renderMobileJobCards()}
+            {renderJobCards()}
           </div>
         </>
       )}

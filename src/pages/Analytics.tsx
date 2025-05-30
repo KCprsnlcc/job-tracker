@@ -84,7 +84,7 @@ const Analytics: React.FC = () => {
       transition={{ duration: 0.5 }}
     >
       <motion.header 
-        className="bg-card border-b border-border sticky top-0 z-10"
+        className="bg-card border-b border-border sticky top-0 z-50"
         style={{ opacity: headerOpacity }}
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -92,24 +92,27 @@ const Analytics: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <motion.h1 
-            className="text-2xl font-bold flex items-center gap-2"
-            whileHover={{ scale: 1.03 }}
+            className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-primary"
+            whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <Link to="/dashboard" className="flex items-center gap-2">
+            <Link to="/dashboard" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
               <motion.img 
                 src="/favicon.ico" 
                 alt="Job Tracker" 
-                className="w-6 h-6" 
+                className="w-5 h-5 sm:w-6 sm:h-6" 
                 initial={{ rotate: 0 }}
                 animate={{ rotate: 360 }}
-                transition={{ duration: 2, delay: 0.5 }}
+                transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
               />
-              Job Tracker
+              <span className="hidden sm:inline">Job Tracker</span>
+              <span className="sm:hidden">Job Tracker</span>
             </Link>
           </motion.h1>
+          
+          {/* Desktop Navigation */}
           <motion.div 
-            className="flex items-center space-x-4"
+            className="hidden md:flex items-center space-x-4"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -131,6 +134,32 @@ const Analytics: React.FC = () => {
               >
                 <LogOut className="h-4 w-4" />
                 <span>Sign Out</span>
+                <motion.div 
+                  className="absolute inset-0 bg-primary/10" 
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
+              </Button>
+            </motion.div>
+          </motion.div>
+          
+          {/* Mobile Navigation */}
+          <motion.div 
+            className="md:hidden flex items-center space-x-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <ThemeToggle />
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => signOut()}
+                className="relative overflow-hidden"
+              >
+                <LogOut className="h-4 w-4" />
                 <motion.div 
                   className="absolute inset-0 bg-primary/10" 
                   initial={{ x: "-100%" }}

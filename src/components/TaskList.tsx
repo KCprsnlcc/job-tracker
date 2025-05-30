@@ -131,15 +131,16 @@ const TaskList: React.FC<TaskListProps> = ({
   
   // Render task cards for mobile view
   const renderMobileTaskCards = () => {
-    return tasks.map((task) => (
+    return tasks.map((task, index) => (
       <motion.div 
         key={task.id}
         className="mb-4 last:mb-0"
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: 0.5, delay: index * 0.05 }}
+        whileHover={{ y: -5, transition: { duration: 0.2 } }}
       >
-        <Card className={`p-4 shadow-sm ${task.completed ? 'bg-muted/50' : ''}`}>
+        <Card className={`p-4 hover:shadow-md transition-all duration-300 border-primary/10 ${task.completed ? 'bg-muted/50' : ''}`}>
           <div className="flex items-start gap-3">
             <div className="pt-0.5">
               <Checkbox
@@ -158,7 +159,6 @@ const TaskList: React.FC<TaskListProps> = ({
                   </p>
                 )}
               </div>
-              
               <div className="grid grid-cols-2 gap-2 text-sm mt-3">
                 {showJobInfo && task.job_id && task.job_info && (
                   <div className="col-span-2">
@@ -180,7 +180,6 @@ const TaskList: React.FC<TaskListProps> = ({
                 </div>
               </div>
             </div>
-            
             <div className="flex flex-col space-y-2">
               {!task.completed && (
                 <Button

@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
 import { LogOut, CheckSquare, Plus, Clock, Filter, Check, ArrowLeft, AlertCircle, Search } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
@@ -159,7 +159,7 @@ const TaskManager: React.FC = () => {
       transition={{ duration: 0.5 }}
     >
       <motion.header 
-        className="bg-card border-b border-border sticky top-0 z-10"
+        className="bg-card border-b border-border sticky top-0 z-50"
         style={{ opacity: headerOpacity }}
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -167,24 +167,27 @@ const TaskManager: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <motion.h1 
-            className="text-2xl font-bold flex items-center gap-2"
-            whileHover={{ scale: 1.03 }}
+            className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-primary"
+            whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <Link to="/dashboard" className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
               <motion.img 
                 src="/favicon.ico" 
                 alt="Job Tracker" 
-                className="w-6 h-6" 
+                className="w-5 h-5 sm:w-6 sm:h-6" 
                 initial={{ rotate: 0 }}
                 animate={{ rotate: 360 }}
-                transition={{ duration: 2, delay: 0.5 }}
+                transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
               />
-              Job Tracker
+              <span className="hidden sm:inline">Job Tracker</span>
+              <span className="sm:hidden">JT</span>
             </Link>
           </motion.h1>
+          
+          {/* Desktop Navigation */}
           <motion.div 
-            className="flex items-center space-x-4"
+            className="hidden md:flex items-center space-x-4"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -206,6 +209,32 @@ const TaskManager: React.FC = () => {
               >
                 <LogOut className="h-4 w-4" />
                 <span>Sign Out</span>
+                <motion.div 
+                  className="absolute inset-0 bg-primary/10" 
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
+              </Button>
+            </motion.div>
+          </motion.div>
+          
+          {/* Mobile Navigation */}
+          <motion.div 
+            className="md:hidden flex items-center space-x-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <ThemeToggle />
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => signOut()}
+                className="relative overflow-hidden"
+              >
+                <LogOut className="h-4 w-4" />
                 <motion.div 
                   className="absolute inset-0 bg-primary/10" 
                   initial={{ x: "-100%" }}
@@ -427,6 +456,50 @@ const TaskManager: React.FC = () => {
         
 
 
+        <motion.div 
+          className="mt-6"
+          variants={itemVariants}
+        >
+          <Card className="overflow-hidden hover:shadow-md transition-all duration-300 border-primary/10">
+            <CardContent className="p-4 sm:p-6">
+              {filteredTasks.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="mx-auto h-12 w-12 text-muted-foreground">
+                    <svg
+                      className="h-12 w-12"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="mt-2 text-sm font-medium">No tasks found</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {filterType === 'all' 
+                      ? 'Get started by creating a new task.' 
+                      : 'Try changing your filters to see more tasks.'}
+                  </p>
+                </div>
+              ) : (
+                <TaskList 
+                  tasks={filteredTasks} 
+                  onEdit={handleEditTask} 
+                  onRefresh={fetchTasks}
+                  showJobInfo={true}
+                  loading={loading}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
         <AnimatePresence mode="wait">
           {loading ? (
             <motion.div 
@@ -452,69 +525,6 @@ const TaskManager: React.FC = () => {
               transition={{ duration: 0.5 }}
               variants={itemVariants}
             >
-              <TaskList
-                tasks={filteredTasks}
-                onEdit={handleEditTask}
-                onRefresh={fetchTasks}
-                showJobInfo={true}
-                loading={false}
-              />
-              
-              {filteredTasks.length === 0 && !loading && (
-                <motion.div 
-                  className="text-center py-12"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1, rotate: 10 }}
-                    transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
-                    className="mb-4"
-                  >
-                    <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground" />
-                  </motion.div>
-                  <motion.h3 
-                    className="text-lg font-medium"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                  >
-                    No tasks found
-                  </motion.h3>
-                  <motion.p 
-                    className="text-muted-foreground mt-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                  >
-                    You don't have any tasks yet. Add a new task to get started.
-                  </motion.p>
-                  <motion.div 
-                    className="mt-4 flex justify-center"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.5 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button 
-                      onClick={handleAddTask}
-                      className="relative overflow-hidden flex items-center gap-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Create Task
-                      <motion.div 
-                        className="absolute inset-0 bg-white/20" 
-                        initial={{ x: "-100%" }}
-                        whileHover={{ x: "100%" }}
-                        transition={{ duration: 0.8, ease: "easeInOut" }}
-                      />
-                    </Button>
-                  </motion.div>
-                </motion.div>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
