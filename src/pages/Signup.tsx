@@ -124,19 +124,36 @@ const Signup: React.FC = () => {
           transition={{ duration: 0.6 }}
           className="max-w-md w-full"
         >
-          <Card className="max-w-md w-full overflow-hidden">
+          <motion.div
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+          >
+            <Card className="w-full overflow-hidden hover:shadow-md transition-all duration-300 border-primary/10">
           <CardHeader className="space-y-1">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex justify-center mb-2"
+            >
+              <motion.div 
+                className="p-2 rounded-full bg-primary/10"
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <Mail className="h-6 w-6 text-primary" />
+              </motion.div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
             >
               <CardTitle className="text-2xl font-bold text-center">Verify Your Email</CardTitle>
             </motion.div>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
               <CardDescription className="text-center">
                 We've sent a verification link to your email
@@ -170,18 +187,7 @@ const Signup: React.FC = () => {
               )}
             </AnimatePresence>
             
-            <motion.div 
-              className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-2"
-              initial={{ scale: 0, rotate: 0 }} 
-              animate={{ scale: 1, rotate: [0, 10, 0] }} 
-              transition={{
-                scale: { type: "spring", stiffness: 260, damping: 20, delay: 0.4 }, 
-                rotate: { type: "tween", duration: 0.5, ease: "circOut", delay: 0.4, times: [0, 0.5, 1] } 
-              }}
-              whileHover={{ scale: 1.1, rotate: 5 }}
-            >
-              <Mail className="h-8 w-8 text-primary" />
-            </motion.div>
+
             
             <motion.div 
               className="space-y-2"
@@ -245,25 +251,25 @@ const Signup: React.FC = () => {
             </motion.div>
           </CardContent>
           
-          <CardFooter className="flex flex-col items-center border-t pt-6">
-            <motion.p 
-              className="text-sm text-muted-foreground"
+          <CardFooter className="flex flex-col items-center">
+            <motion.div 
+              className="mt-4 text-center text-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 1 }}
             >
               Already verified?{' '}
-              <motion.span 
-                whileHover={{ scale: 1.05 }}
-                className="inline-block"
-              >
-                <Link to="/login" className="text-primary hover:underline">
-                  Sign in
-                </Link>
-              </motion.span>
-            </motion.p>
+              <Link to="/login" className="font-medium text-primary hover:underline">
+                Sign in
+              </Link>
+              <br />
+              <Link to="/privacy-policy" className="text-xs text-muted-foreground hover:underline">
+                Privacy Policy
+              </Link>
+            </motion.div>
           </CardFooter>
-          </Card>
+            </Card>
+          </motion.div>
         </motion.div>
       </motion.div>
     );
@@ -283,7 +289,10 @@ const Signup: React.FC = () => {
         transition={{ duration: 0.6, delay: 0.1 }}
         className="max-w-md w-full"
       >
-        <Card className="max-w-md w-full overflow-hidden">
+        <motion.div
+          whileHover={{ y: -5, transition: { duration: 0.2 } }}
+        >
+          <Card className="w-full overflow-hidden hover:shadow-md transition-all duration-300 border-primary/10">
         <CardHeader className="space-y-1">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -458,7 +467,7 @@ const Signup: React.FC = () => {
           </motion.div>
 
         </CardContent>
-        <CardFooter className="justify-center">
+        <CardFooter className="flex flex-col items-center">
           <motion.div 
             className="mt-4 text-center text-sm"
             initial={{ opacity: 0 }}
@@ -475,7 +484,8 @@ const Signup: React.FC = () => {
             </Link>
           </motion.div>
         </CardFooter>
-        </Card>
+          </Card>
+        </motion.div>
       </motion.div>
     </motion.div>
   );
