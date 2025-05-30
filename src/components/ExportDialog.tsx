@@ -38,8 +38,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose }) => {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [company, setCompany] = useState('');
-  const [includeNotes, setIncludeNotes] = useState(true);
-  const [includeTasks, setIncludeTasks] = useState(false);
+  const [includeTasks, setIncludeTasks] = useState(true);
   const [exportName, setExportName] = useState('job-applications');
   
   // Scheduled export state
@@ -69,8 +68,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose }) => {
     setEndDate(undefined);
     setSelectedStatuses([]);
     setCompany('');
-    setIncludeNotes(true);
-    setIncludeTasks(false);
+    setIncludeTasks(true);
     setExportName('job-applications');
     setFrequency('weekly');
     setDestination('download');
@@ -93,7 +91,6 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose }) => {
         endDate: endDate ? formatDate(endDate, 'yyyy-MM-dd') : undefined,
         status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
         company: company || undefined,
-        includeNotes,
         includeTasks,
       };
       
@@ -142,7 +139,6 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose }) => {
         endDate: endDate ? formatDate(endDate, 'yyyy-MM-dd') : undefined,
         status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
         company: company || undefined,
-        includeNotes,
         includeTasks,
       };
       
@@ -289,22 +285,14 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose }) => {
                 
                 <div className="space-y-2">
                   <Label>Include Options</Label>
-                  <div className="flex space-x-6">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="includeNotes" 
-                        checked={includeNotes} 
-                        onCheckedChange={(checked) => setIncludeNotes(!!checked)} 
-                      />
-                      <Label htmlFor="includeNotes" className="text-sm font-normal">Include Notes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
                       <Checkbox 
                         id="includeTasks" 
-                        checked={includeTasks} 
-                        onCheckedChange={(checked) => setIncludeTasks(!!checked)} 
+                        checked={includeTasks}
+                        onCheckedChange={() => setIncludeTasks(!includeTasks)}
                       />
-                      <Label htmlFor="includeTasks" className="text-sm font-normal">Include Tasks</Label>
+                      <Label htmlFor="includeTasks">Include Tasks</Label>
                     </div>
                   </div>
                 </div>
@@ -462,14 +450,6 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose }) => {
                 <div className="space-y-2">
                   <Label>Include Options</Label>
                   <div className="flex space-x-6">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="scheduleIncludeNotes" 
-                        checked={includeNotes} 
-                        onCheckedChange={(checked) => setIncludeNotes(!!checked)} 
-                      />
-                      <Label htmlFor="scheduleIncludeNotes" className="text-sm font-normal">Include Notes</Label>
-                    </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox 
                         id="scheduleIncludeTasks" 

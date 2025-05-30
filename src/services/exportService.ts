@@ -2,13 +2,13 @@ import { supabase } from '../lib/supabase';
 import { Job, Task, JobStatus } from '../types';
 import { formatDate } from '../lib/utils';
 import { normalizePriority } from '../types/priority';
+import html2pdf from 'html2pdf.js';
 
 export interface ExportFilter {
   startDate?: string;
   endDate?: string;
   status?: string[];
   company?: string;
-  includeNotes?: boolean;
   includeTasks?: boolean;
 }
 
@@ -122,39 +122,66 @@ export const exportToJSON = async (userId: string, options: ExportOptions): Prom
 export const exportToCSV = async (userId: string, options: ExportOptions): Promise<string> => {
   const jobs = await getFilteredJobs(userId, options.filters);
   
-  // Define CSV headers
-  let headers = ['ID', 'Company', 'Role', 'Location', 'Status', 'Date Applied', 'URL'];
-  
-  if (options.filters.includeNotes) {
-    headers.push('Notes');
+  // Get tasks if requested
+  let tasksByJobId: { [jobId: string]: Task[] } = {};
+  if (options.filters.includeTasks && jobs.length > 0) {
+    const jobIds = jobs.map(job => job.id).filter((id): id is string => id !== undefined);
+    tasksByJobId = await getJobTasks(jobIds);
   }
   
+  // Define CSV headers for jobs
+  let headers = ['ID', 'Company', 'Role', 'Location', 'Status', 'Date Applied', 'URL', 'Notes'];
+  
   // Convert jobs to CSV rows
-  const rows = jobs.map(job => {
-    let row = [
+  const jobRows = jobs.map(job => {
+    return [
       job.id,
       job.company,
       job.role,
       job.location,
       job.status,
       formatDate(job.date_applied),
-      job.link || ''
+      job.link || '',
+      job.notes || ''
     ];
-    
-    if (options.filters.includeNotes) {
-      row.push(job.notes || '');
-    }
-    
-    return row;
   });
   
-  // Combine headers and rows
-  const csvContent = [
+  // Combine job headers and rows
+  let csvContent = [
     headers.join(','),
-    ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-  ].join('\n');
+    ...jobRows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+  ];
   
-  return csvContent;
+  // Add tasks section if requested
+  if (options.filters.includeTasks) {
+    csvContent.push(''); // Empty line separator
+    csvContent.push('"TASKS"');
+    
+    // Task headers
+    const taskHeaders = ['Job ID', 'Company', 'Task ID', 'Title', 'Description', 'Due Date', 'Status', 'Priority'];
+    csvContent.push(taskHeaders.join(','));
+    
+    // Add task rows
+    jobs.forEach(job => {
+      if (typeof job.id === 'string' && tasksByJobId[job.id] && tasksByJobId[job.id].length > 0) {
+        tasksByJobId[job.id].forEach(task => {
+          const taskRow = [
+            job.id,
+            job.company,
+            task.id,
+            task.title,
+            task.description || '',
+            task.due_date ? formatDate(task.due_date) : '',
+            task.completed ? 'Completed' : 'Pending',
+            task.priority
+          ];
+          csvContent.push(taskRow.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','));
+        });
+      }
+    });
+  }
+  
+  return csvContent.join('\n');
 };
 
 // Export to XML format
@@ -184,7 +211,7 @@ export const exportToXML = async (userId: string, options: ExportOptions): Promi
       xml += `    <URL>${escapeXml(job.link)}</URL>\n`;
     }
     
-    if (options.filters.includeNotes && job.notes) {
+    if (job.notes) {
       xml += `    <Notes>${escapeXml(job.notes)}</Notes>\n`;
     }
     
@@ -223,7 +250,7 @@ export const exportToPDF = async (userId: string, options: ExportOptions): Promi
     tasksByJobId = await getJobTasks(jobIds);
   }
   
-  // Generate HTML content that could be converted to PDF
+  // Generate HTML content that will be converted to PDF
   let html = `
     <!DOCTYPE html>
     <html>
@@ -235,13 +262,17 @@ export const exportToPDF = async (userId: string, options: ExportOptions): Promi
         table { border-collapse: collapse; width: 100%; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
-        .task-table { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
+        .task-table { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; width: 95%; }
         .job-notes { white-space: pre-wrap; margin-top: 10px; }
+        .page-header { text-align: center; margin-bottom: 20px; }
+        .page-footer { text-align: center; margin-top: 20px; font-size: 0.8em; color: #666; }
       </style>
     </head>
     <body>
-      <h1>Job Applications Export</h1>
-      <p>Generated on: ${new Date().toLocaleDateString()}</p>
+      <div class="page-header">
+        <h1>Job Applications Export</h1>
+        <p>Generated on: ${new Date().toLocaleDateString()}</p>
+      </div>
   `;
   
   // Add jobs table
@@ -269,8 +300,8 @@ export const exportToPDF = async (userId: string, options: ExportOptions): Promi
       </tr>
     `;
     
-    // Add notes if requested
-    if (options.filters.includeNotes && job.notes) {
+    // Always include notes
+    if (job.notes) {
       html += `
         <tr>
           <td colspan="6">
@@ -321,6 +352,9 @@ export const exportToPDF = async (userId: string, options: ExportOptions): Promi
   
   html += `
     </table>
+    <div class="page-footer">
+      <p>Job Tracker Application - Data Export</p>
+    </div>
     </body>
     </html>
   `;
@@ -420,6 +454,40 @@ export const exportData = async (userId: string, options: ExportOptions): Promis
 
 // Execute the export and trigger download
 export const executeExport = async (userId: string, options: ExportOptions): Promise<void> => {
+  // For PDF format, we need to handle differently
+  if (options.format === 'pdf') {
+    const htmlContent = await exportToPDF(userId, options);
+    const fileName = generateExportFileName(options);
+    
+    // Create an HTML element to render the PDF
+    const element = document.createElement('div');
+    element.innerHTML = htmlContent;
+    document.body.appendChild(element);
+    
+    // Configure html2pdf options
+    const pdfOptions = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    try {
+      // Generate and download the PDF
+      await html2pdf().from(element).set(pdfOptions).save();
+      
+      // Remove the temporary element
+      document.body.removeChild(element);
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      throw new Error('Failed to generate PDF file');
+    }
+    
+    return;
+  }
+  
+  // For other formats, continue with the standard approach
   const data = await exportData(userId, options);
   const fileName = generateExportFileName(options);
   
@@ -433,9 +501,6 @@ export const executeExport = async (userId: string, options: ExportOptions): Pro
       break;
     case 'xml':
       mimeType = 'application/xml';
-      break;
-    case 'pdf':
-      mimeType = 'application/pdf';
       break;
     default:
       mimeType = 'text/plain';

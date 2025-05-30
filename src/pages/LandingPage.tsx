@@ -373,7 +373,7 @@ const LandingPage: React.FC = () => {
               visible: { opacity: 1, transition: { duration: 0.5, delay: 0.2 } }
             }}
           >
-            Join thousands of job seekers who use Job Tracker to streamline their application process.
+            Join thousands of job seekers who use Job Tracker to maximize their application process.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row justify-center gap-4"
