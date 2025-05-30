@@ -196,26 +196,63 @@ const TaskManager: React.FC = () => {
   // Mobile menu items for side drawer
   const MobileMenuItem = ({ icon, label, onClick, to, highlight = false }: any) => (
     <motion.div
-      whileHover={{ x: 5 }}
-      whileTap={{ scale: 0.95 }}
-      className="w-full"
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+      className="w-full mb-1"
     >
       {to ? (
-        <Link
-          to={to}
-          className={`flex items-center gap-3 py-3 px-4 rounded-md hover:bg-muted ${highlight ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}`}
+        <motion.div
+          whileHover={{ x: 5, backgroundColor: highlight ? "var(--primary-hover)" : "var(--muted)" }}
+          whileTap={{ scale: 0.98 }}
+          className="overflow-hidden rounded-md"
         >
-          {icon}
-          <span>{label}</span>
-        </Link>
+          <Link
+            to={to}
+            className={`flex items-center gap-3 py-3 px-4 rounded-md ${highlight ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'} transition-all duration-300 relative`}
+          >
+            <motion.div
+              initial={{ scale: 1 }}
+              whileHover={{ scale: 1.15, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              {icon}
+            </motion.div>
+            <span>{label}</span>
+            <motion.div 
+              className="absolute inset-0 bg-white/10" 
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "100%" }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+            />
+          </Link>
+        </motion.div>
       ) : (
-        <button
-          onClick={onClick}
-          className={`flex items-center gap-3 py-3 px-4 rounded-md hover:bg-muted w-full text-left ${highlight ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}`}
+        <motion.div
+          whileHover={{ x: 5, backgroundColor: highlight ? "var(--primary-hover)" : "var(--muted)" }}
+          whileTap={{ scale: 0.98 }}
+          className="overflow-hidden rounded-md"
         >
-          {icon}
-          <span>{label}</span>
-        </button>
+          <button
+            onClick={onClick}
+            className={`flex items-center gap-3 py-3 px-4 rounded-md ${highlight ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'} w-full text-left transition-all duration-300 relative`}
+          >
+            <motion.div
+              initial={{ scale: 1 }}
+              whileHover={{ scale: 1.15, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              {icon}
+            </motion.div>
+            <span>{label}</span>
+            <motion.div 
+              className="absolute inset-0 bg-white/10" 
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "100%" }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+            />
+          </button>
+        </motion.div>
       )}
     </motion.div>
   );
@@ -301,20 +338,51 @@ const TaskManager: React.FC = () => {
             <ThemeToggle />
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9">
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle menu</span>
-                </Button>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-9 w-9 relative overflow-hidden group"
+                  >
+                    <Menu className="h-5 w-5 transition-transform duration-200 group-hover:rotate-90" />
+                    <motion.div 
+                      className="absolute inset-0 bg-primary/10 rounded-md" 
+                      initial={{ scale: 0, opacity: 0 }}
+                      whileHover={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                    />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                </motion.div>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[90vw] max-w-md">
+              <SheetContent side="right" className="w-[90vw] max-w-md border-l border-primary/10">
                 <SheetHeader className="mb-6">
-                  <SheetTitle className="flex items-center gap-2">
-                    <img src="/favicon.ico" alt="Job Tracker" className="w-6 h-6" />
-                    Job Tracker
-                  </SheetTitle>
-                  <SheetDescription className="text-sm">
-                    {user?.email}
-                  </SheetDescription>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <SheetTitle className="flex items-center gap-2 text-primary">
+                      <motion.img 
+                        src="/favicon.ico" 
+                        alt="Job Tracker" 
+                        className="w-6 h-6" 
+                        initial={{ rotate: 0 }}
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 2, ease: "easeInOut" }}
+                      />
+                      Job Tracker
+                    </SheetTitle>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.1 }}
+                  >
+                    <SheetDescription className="text-sm font-medium">
+                      {user?.email}
+                    </SheetDescription>
+                  </motion.div>
                 </SheetHeader>
                 
                 {/* Mobile Search & Filters - Matching Main Content */}

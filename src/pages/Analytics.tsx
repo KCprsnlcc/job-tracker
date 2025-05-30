@@ -163,44 +163,154 @@ const Analytics: React.FC = () => {
             <ThemeToggle />
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9">
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle menu</span>
-                </Button>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-9 w-9 relative overflow-hidden group"
+                  >
+                    <Menu className="h-5 w-5 transition-transform duration-200 group-hover:rotate-90" />
+                    <motion.div 
+                      className="absolute inset-0 bg-primary/10 rounded-md" 
+                      initial={{ scale: 0, opacity: 0 }}
+                      whileHover={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                    />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                </motion.div>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[80vw] max-w-sm">
+              <SheetContent side="right" className="w-[90vw] max-w-md border-l border-primary/10">
                 <SheetHeader className="mb-6">
-                  <SheetTitle className="flex items-center gap-2">
-                    <img src="/favicon.ico" alt="Job Tracker" className="w-6 h-6" />
-                    Job Tracker
-                  </SheetTitle>
-                  <SheetDescription className="text-sm">
-                    {user?.email}
-                  </SheetDescription>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <SheetTitle className="flex items-center gap-2 text-primary">
+                      <motion.img 
+                        src="/favicon.ico" 
+                        alt="Job Tracker" 
+                        className="w-6 h-6" 
+                        initial={{ rotate: 0 }}
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 2, ease: "easeInOut" }}
+                      />
+                      Job Tracker
+                    </SheetTitle>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.1 }}
+                  >
+                    <SheetDescription className="text-sm font-medium">
+                      {user?.email}
+                    </SheetDescription>
+                  </motion.div>
                 </SheetHeader>
                 <div className="flex flex-col gap-1">
-                  <Link 
-                    to="/dashboard" 
-                    className="flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors"
+                  {/* Enhanced menu items */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full mb-1"
                   >
-                    <ArrowRight className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                  <Link 
-                    to="/tasks" 
-                    className="flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors"
+                    <motion.div
+                      whileHover={{ x: 5, backgroundColor: "var(--muted)" }}
+                      whileTap={{ scale: 0.98 }}
+                      className="overflow-hidden rounded-md"
+                    >
+                      <Link
+                        to="/dashboard"
+                        className="flex items-center gap-3 py-3 px-4 rounded-md hover:bg-muted transition-all duration-300 relative"
+                      >
+                        <motion.div
+                          initial={{ scale: 1 }}
+                          whileHover={{ scale: 1.15, rotate: 5 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </motion.div>
+                        <span>Dashboard</span>
+                        <motion.div 
+                          className="absolute inset-0 bg-white/10" 
+                          initial={{ x: "-100%" }}
+                          whileHover={{ x: "100%" }}
+                          transition={{ duration: 0.6, ease: "easeInOut" }}
+                        />
+                      </Link>
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 0.1 }}
+                    className="w-full mb-1"
                   >
-                    <CheckSquare className="h-4 w-4" />
-                    <span>Tasks</span>
-                  </Link>
+                    <motion.div
+                      whileHover={{ x: 5, backgroundColor: "var(--muted)" }}
+                      whileTap={{ scale: 0.98 }}
+                      className="overflow-hidden rounded-md"
+                    >
+                      <Link
+                        to="/tasks"
+                        className="flex items-center gap-3 py-3 px-4 rounded-md hover:bg-muted transition-all duration-300 relative"
+                      >
+                        <motion.div
+                          initial={{ scale: 1 }}
+                          whileHover={{ scale: 1.15, rotate: 5 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                        >
+                          <CheckSquare className="h-4 w-4" />
+                        </motion.div>
+                        <span>Tasks</span>
+                        <motion.div 
+                          className="absolute inset-0 bg-white/10" 
+                          initial={{ x: "-100%" }}
+                          whileHover={{ x: "100%" }}
+                          transition={{ duration: 0.6, ease: "easeInOut" }}
+                        />
+                      </Link>
+                    </motion.div>
+                  </motion.div>
+
                   <div className="my-2 border-t border-border"></div>
-                  <button 
-                    className="flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors w-full text-left"
-                    onClick={signOut}
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 0.2 }}
+                    className="w-full mb-1"
                   >
-                    <LogOut className="h-4 w-4" />
-                    <span>Sign Out</span>
-                  </button>
+                    <motion.div
+                      whileHover={{ x: 5, backgroundColor: "var(--muted)" }}
+                      whileTap={{ scale: 0.98 }}
+                      className="overflow-hidden rounded-md"
+                    >
+                      <button
+                        onClick={signOut}
+                        className="flex items-center gap-3 py-3 px-4 rounded-md hover:bg-muted w-full text-left transition-all duration-300 relative"
+                      >
+                        <motion.div
+                          initial={{ scale: 1 }}
+                          whileHover={{ scale: 1.15, rotate: 5 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                        >
+                          <LogOut className="h-4 w-4" />
+                        </motion.div>
+                        <span>Sign Out</span>
+                        <motion.div 
+                          className="absolute inset-0 bg-white/10" 
+                          initial={{ x: "-100%" }}
+                          whileHover={{ x: "100%" }}
+                          transition={{ duration: 0.6, ease: "easeInOut" }}
+                        />
+                      </button>
+                    </motion.div>
+                  </motion.div>
                 </div>
               </SheetContent>
             </Sheet>
