@@ -46,6 +46,7 @@ const Contact: React.FC = () => {
     message: ''
   });
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -140,70 +141,148 @@ const Contact: React.FC = () => {
       transition={{ duration: 0.4, ease: "easeInOut" }}
       className="min-h-screen bg-background text-foreground flex flex-col"
     >
-      {/* Global Header - same as LandingPage.tsx and PrivacyPolicy.tsx */}
+      {/* Global Header with mobile support */}
       <motion.header 
         className="bg-card border-b border-border sticky top-0 z-50"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <motion.h1 
-            className="text-2xl font-bold flex items-center gap-2"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <motion.img 
-              src="/favicon.ico" 
-              alt="Job Tracker" 
-              className="w-6 h-6" 
-              initial={{ rotate: 0 }}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
-            />
-            <Link to="/" className="text-primary hover:text-primary/80 transition-colors">
-              Job Tracker
-            </Link>
-          </motion.h1>
-          <div className="flex items-center space-x-4">
-            <motion.div
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <motion.h1 
+              className="text-2xl font-bold flex items-center gap-2"
               whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="text-sm hidden md:block"
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <motion.img 
+                src="/favicon.ico" 
+                alt="Job Tracker" 
+                className="w-6 h-6" 
+                initial={{ rotate: 0 }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
+              />
+              <Link to="/" className="text-primary hover:text-primary/80 transition-colors">
+                Job Tracker
+              </Link>
+            </motion.h1>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-sm"
+              >
+                <Link
+                  to="/privacy-policy"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                >
+                  Privacy Policy
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-sm"
+              >
+                <Link
+                  to="/terms-of-service"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                >
+                  Terms of Service
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-sm"
+              >
+                <Link
+                  to="/contact"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                >
+                  Contact
+                </Link>
+              </motion.div>
+              <ThemeToggle />
+              <div className="flex gap-2">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button variant="outline" asChild>
+                    <Link to="/login">Login</Link>
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button asChild>
+                    <Link to="/signup">Sign Up</Link>
+                  </Button>
+                </motion.div>
+              </div>
+            </div>
+            
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center gap-2">
+              <ThemeToggle />
+              <Button 
+                variant="ghost" 
+                className="p-2" 
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-6 w-6" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  {mobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </Button>
+            </div>
+          </div>
+          
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <motion.div 
+              className="md:hidden pt-2 pb-4 space-y-3"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
             >
               <Link
                 to="/privacy-policy"
-                className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                className="block px-2 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
               >
                 Privacy Policy
               </Link>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="text-sm hidden md:block"
-            >
+              <Link
+                to="/terms-of-service"
+                className="block px-2 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                Terms of Service
+              </Link>
               <Link
                 to="/contact"
-                className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                className="block px-2 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
               >
                 Contact
               </Link>
-            </motion.div>
-            <ThemeToggle />
-            <div className="flex gap-2">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button variant="outline" asChild>
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" asChild className="w-full">
                   <Link to="/login">Login</Link>
                 </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button asChild>
+                <Button asChild className="w-full">
                   <Link to="/signup">Sign Up</Link>
                 </Button>
-              </motion.div>
-            </div>
-          </div>
+              </div>
+            </motion.div>
+          )}
         </div>
       </motion.header>
 

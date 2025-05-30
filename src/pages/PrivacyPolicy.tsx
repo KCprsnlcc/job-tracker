@@ -1,10 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
-import { ShieldCheck, FileText, DatabaseZap, Cookie, Link2, Users, Mail, Info, Clock, FileLock, Edit3 } from 'lucide-react';
+import { ShieldCheck, FileText, DatabaseZap, Cookie, Link2, Users, Mail, Info, Clock, FileLock, Edit3, Scale } from 'lucide-react';
 import Footer from '../components/Footer'; // Assuming you have a Footer component
-import { ThemeToggle } from '../components/theme-toggle'; // Added for global header
-import { Button } from '../components/ui/button'; // Added for global header
+import { ThemeToggle } from '../components/theme-toggle';
+import { Button } from '../components/ui/button';
 
 const Section: React.FC<{
   title: string;
@@ -35,6 +35,8 @@ const Section: React.FC<{
 };
 
 const PrivacyPolicy: React.FC = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   const pageVariants = {
     initial: { opacity: 0, y: 20 },
     in: { opacity: 1, y: 0 },
@@ -63,70 +65,148 @@ const PrivacyPolicy: React.FC = () => {
       transition={{ duration: 0.4, ease: "easeInOut" }}
       className="min-h-screen bg-background text-foreground flex flex-col"
     >
-      {/* Global Header from LandingPage.tsx */}
+      {/* Global Header with mobile support */}
       <motion.header 
         className="bg-card border-b border-border sticky top-0 z-50"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <motion.h1 
-            className="text-2xl font-bold flex items-center gap-2"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <motion.img 
-              src="/favicon.ico" 
-              alt="Job Tracker" 
-              className="w-6 h-6" 
-              initial={{ rotate: 0 }}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
-            />
-            <Link to="/" className="text-primary hover:text-primary/80 transition-colors">
-              Job Tracker
-            </Link>
-          </motion.h1>
-          <div className="flex items-center space-x-4">
-            <motion.div
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <motion.h1 
+              className="text-2xl font-bold flex items-center gap-2"
               whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="text-sm hidden md:block" // Hide on small screens if needed
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <motion.img 
+                src="/favicon.ico" 
+                alt="Job Tracker" 
+                className="w-6 h-6" 
+                initial={{ rotate: 0 }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
+              />
+              <Link to="/" className="text-primary hover:text-primary/80 transition-colors">
+                Job Tracker
+              </Link>
+            </motion.h1>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-sm"
+              >
+                <Link
+                  to="/privacy-policy"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                >
+                  Privacy Policy
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-sm"
+              >
+                <Link
+                  to="/terms-of-service"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                >
+                  Terms of Service
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-sm"
+              >
+                <Link
+                  to="/contact"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                >
+                  Contact
+                </Link>
+              </motion.div>
+              <ThemeToggle />
+              <div className="flex gap-2">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button variant="outline" asChild>
+                    <Link to="/login">Login</Link>
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button asChild>
+                    <Link to="/signup">Sign Up</Link>
+                  </Button>
+                </motion.div>
+              </div>
+            </div>
+            
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center gap-2">
+              <ThemeToggle />
+              <Button 
+                variant="ghost" 
+                className="p-2" 
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-6 w-6" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  {mobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </Button>
+            </div>
+          </div>
+          
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <motion.div 
+              className="md:hidden pt-2 pb-4 space-y-3"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
             >
               <Link
                 to="/privacy-policy"
-                className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                className="block px-2 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
               >
                 Privacy Policy
               </Link>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="text-sm hidden md:block" // Hide on small screens if needed
-            >
+              <Link
+                to="/terms-of-service"
+                className="block px-2 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                Terms of Service
+              </Link>
               <Link
                 to="/contact"
-                className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                className="block px-2 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
               >
                 Contact
               </Link>
-            </motion.div>
-            <ThemeToggle />
-            <div className="flex gap-2">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button variant="outline" asChild>
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" asChild className="w-full">
                   <Link to="/login">Login</Link>
                 </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button asChild>
+                <Button asChild className="w-full">
                   <Link to="/signup">Sign Up</Link>
                 </Button>
-              </motion.div>
-            </div>
-          </div>
+              </div>
+            </motion.div>
+          )}
         </div>
       </motion.header>
 
@@ -144,7 +224,7 @@ const PrivacyPolicy: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4, type: "spring", stiffness: 100 }}
           >
-            Privacy Policy & Terms of Service
+            Privacy Policy
           </motion.h1>
           <motion.p 
             className="text-lg md:text-xl text-muted-foreground"
@@ -278,32 +358,29 @@ const PrivacyPolicy: React.FC = () => {
             We may update this privacy policy from time to time. The updated version will be indicated by an updated "Last updated" date and the updated version will be effective as soon as it is accessible. If we make material changes to this privacy policy, we may notify you either by prominently posting a notice of such changes or by directly sending you a notification. We encourage you to review this privacy policy frequently to be informed of how we are protecting your information.
           </p>
           <p className="mt-2 text-sm">
-            <em>Last updated: [May 29, 2025]</em>
+            <em>Last updated: May 30, 2025</em>
           </p>
         </Section>
 
-        <Section title="Terms of Service Summary" icon={<FileText size={28} />}>
+        <Section title="Terms of Service" icon={<Scale size={28} />}>
           <p>
-            By using Job Tracker, you also agree to our Terms of Service. A brief summary includes:
+            By using Job Tracker, you also agree to our Terms of Service, which outline the rules, guidelines, and restrictions that govern your use of our platform.
           </p>
-          <motion.ul className="list-disc list-inside pl-4 space-y-1 mt-2">
-            {[
-              "Acceptance of Terms: By accessing or using the Service, you agree to be bound by these Terms.",
-              "User Accounts: You are responsible for safeguarding your account and for any activities or actions under your account.",
-              "User Conduct: You agree not to use the Service for any unlawful purpose or in any way that might harm, damage, or disparage any other party.",
-              "Intellectual Property: The Service and its original content, features, and functionality are and will remain the exclusive property of Job Tracker and its licensors.",
-              "Termination: We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.",
-              "Limitation of Liability: Our liability is limited to the maximum extent permitted by law.",
-              "Governing Law: These Terms shall be governed by the laws of [Specify Jurisdiction - e.g., California, USA], without regard to its conflict of law provisions."
-            ].map((item, i) => (
-              <motion.li key={i} custom={i + 15} variants={listItemVariants} initial="hidden" animate="visible">
-                {item}
-              </motion.li>
-            ))}
-          </motion.ul>
-          <p className="mt-3">
-            This is a summary. For the full Terms of Service, please visit [Link to Full ToS Page - e.g., /terms-of-service] or contact us.
+          <p>
+            The Terms of Service cover important topics including your account responsibilities, acceptable use, intellectual property rights, limitations of liability, and more.
           </p>
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="mt-4"
+          >
+            <Button asChild>
+              <Link to="/terms-of-service" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                View Full Terms of Service
+              </Link>
+            </Button>
+          </motion.div>
         </Section>
 
         <Section title="Contact Us" icon={<Mail size={28} />}>
@@ -315,7 +392,10 @@ const PrivacyPolicy: React.FC = () => {
               By email: <a href="mailto:kcpersonalacc@gmail.com" className="text-primary hover:underline">kcpersonalacc@gmail.com</a>
             </motion.li>
             <motion.li custom={23} variants={listItemVariants} initial="hidden" animate="visible">
-              By visiting this page on our website (if applicable): <Link to="/contact" className="text-primary hover:underline">Contact Page</Link>
+              By visiting this page on our website: <Link to="/contact" className="text-primary hover:underline">Contact Page</Link>
+            </motion.li>
+            <motion.li custom={24} variants={listItemVariants} initial="hidden" animate="visible">
+              For Terms of Service: <Link to="/terms-of-service" className="text-primary hover:underline">Terms of Service</Link>
             </motion.li>
             {/* Add other contact methods if available, e.g., address */}
           </motion.ul>

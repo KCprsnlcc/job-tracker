@@ -84,6 +84,18 @@ const LandingPage: React.FC = () => {
               className="text-sm"
             >
               <Link
+                to="/terms-of-service"
+                className="text-muted-foreground hover:text-primary transition-colors duration-200"
+              >
+                Terms of Service
+              </Link>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="text-sm"
+            >
+              <Link
                 to="/contact"
                 className="text-muted-foreground hover:text-primary transition-colors duration-200"
               >
@@ -136,6 +148,13 @@ const LandingPage: React.FC = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Privacy Policy
+            </Link>
+            <Link
+              to="/terms-of-service"
+              className="block py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Terms of Service
             </Link>
             <Link
               to="/contact"
