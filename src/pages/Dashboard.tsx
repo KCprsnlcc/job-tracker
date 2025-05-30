@@ -8,7 +8,7 @@ import DeleteConfirmation from '../components/DeleteConfirmation';
 import ExportDialog from '../components/ExportDialog';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { Search, Plus, LogOut, BarChart2, CheckSquare, ArrowRight, Download, Filter } from 'lucide-react';
+import { Search, Plus, LogOut, BarChart2, CheckSquare, ArrowRight, Download, Filter, Menu, X } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
@@ -24,6 +24,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from '../components/ui/sheet';
 
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -40,6 +49,7 @@ const Dashboard: React.FC = () => {
   const [jobToDelete, setJobToDelete] = useState<string | null>(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -192,6 +202,33 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  // Mobile menu items for side drawer
+  const MobileMenuItem = ({ icon, label, onClick, to, highlight = false }: any) => (
+    <motion.div
+      whileHover={{ x: 5 }}
+      whileTap={{ scale: 0.95 }}
+      className="w-full"
+    >
+      {to ? (
+        <Link
+          to={to}
+          className={`flex items-center gap-3 py-3 px-4 rounded-md hover:bg-muted ${highlight ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}`}
+        >
+          {icon}
+          <span>{label}</span>
+        </Link>
+      ) : (
+        <button
+          onClick={onClick}
+          className={`flex items-center gap-3 py-3 px-4 rounded-md hover:bg-muted w-full text-left ${highlight ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}`}
+        >
+          {icon}
+          <span>{label}</span>
+        </button>
+      )}
+    </motion.div>
+  );
+
   return (
     <motion.div 
       className="min-h-screen bg-background"
@@ -208,22 +245,25 @@ const Dashboard: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <motion.h1 
-            className="text-2xl font-bold flex items-center gap-2"
+            className="text-xl sm:text-2xl font-bold flex items-center gap-2"
             whileHover={{ scale: 1.03 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             <motion.img 
               src="/favicon.ico" 
               alt="Job Tracker" 
-              className="w-6 h-6" 
+              className="w-5 h-5 sm:w-6 sm:h-6" 
               initial={{ rotate: 0 }}
               animate={{ rotate: 360 }}
               transition={{ duration: 2, delay: 0.5 }}
             />
-            Job Tracker
+            <span className="hidden sm:inline">Job Tracker</span>
+            <span className="sm:hidden">JT</span>
           </motion.h1>
+          
+          {/* Desktop Navigation */}
           <motion.div 
-            className="flex items-center space-x-4"
+            className="hidden md:flex items-center space-x-4"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -257,20 +297,86 @@ const Dashboard: React.FC = () => {
               </Button>
             </motion.div>
           </motion.div>
+          
+          {/* Mobile Menu Button */}
+          <motion.div 
+            className="md:hidden flex items-center gap-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <ThemeToggle />
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[80vw] max-w-sm">
+                <SheetHeader className="mb-6">
+                  <SheetTitle className="flex items-center gap-2">
+                    <img src="/favicon.ico" alt="Job Tracker" className="w-6 h-6" />
+                    Job Tracker
+                  </SheetTitle>
+                  <SheetDescription className="text-sm">
+                    {user?.email}
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="flex flex-col gap-1">
+                  <MobileMenuItem 
+                    icon={<BarChart2 className="h-4 w-4" />} 
+                    label="Analytics" 
+                    to="/analytics" 
+                  />
+                  <MobileMenuItem 
+                    icon={<CheckSquare className="h-4 w-4" />} 
+                    label="Tasks" 
+                    to="/tasks" 
+                  />
+                  <MobileMenuItem 
+                    icon={<Plus className="h-4 w-4" />} 
+                    label="Add Job" 
+                    onClick={() => {
+                      handleAddJob();
+                      // Close the sheet
+                      (document.querySelector('[data-radix-collection-item]') as HTMLElement)?.click();
+                    }}
+                    highlight
+                  />
+                  <MobileMenuItem 
+                    icon={<Download className="h-4 w-4" />} 
+                    label="Export Data" 
+                    onClick={() => {
+                      setExportDialogOpen(true);
+                      // Close the sheet
+                      (document.querySelector('[data-radix-collection-item]') as HTMLElement)?.click();
+                    }}
+                  />
+                  <div className="my-2 border-t border-border"></div>
+                  <MobileMenuItem 
+                    icon={<LogOut className="h-4 w-4" />} 
+                    label="Sign Out" 
+                    onClick={signOut}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </motion.div>
         </div>
       </motion.header>
 
       <motion.main 
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
         <motion.div 
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0"
+          className="flex flex-col mb-6 space-y-4"
           variants={itemVariants}
         >
-          <motion.div>
+          <motion.div className="flex justify-between items-center">
             <motion.h2 
               className="text-xl font-semibold"
               initial={{ opacity: 0, x: -20 }}
@@ -279,64 +385,15 @@ const Dashboard: React.FC = () => {
             >
               Your Job Applications
             </motion.h2>
-            <motion.p 
-              className="text-sm text-muted-foreground mt-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'} found
-            </motion.p>
-          </motion.div>
-
-          <motion.div 
-            className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <motion.div 
-              className="relative"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search jobs..."
-                className="pl-8 w-full sm:w-[200px] lg:w-[300px] transition-all duration-300 focus:ring-2 focus:ring-primary/50"
-                value={searchTerm}
-                onChange={handleSearch}
-              />
-            </motion.div>
-
-            <motion.div 
-              className="relative flex items-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select
-                value={statusFilter}
-                onValueChange={handleFilterChange}
-              >
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="applied">Applied</SelectItem>
-                  <SelectItem value="interview">Interview</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
-                  <SelectItem value="offer">Offer</SelectItem>
-                  <SelectItem value="accepted">Accepted</SelectItem>
-                </SelectContent>
-              </Select>
-            </motion.div>
-
+            
+            {/* Desktop Add Job Button */}
             <motion.div
+              className="hidden sm:block"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
             >
               <Button
                 onClick={handleAddJob}
@@ -350,6 +407,97 @@ const Dashboard: React.FC = () => {
                   whileHover={{ x: "100%" }}
                   transition={{ duration: 0.8, ease: "easeInOut" }}
                 />
+              </Button>
+            </motion.div>
+            
+            {/* Mobile Add Button - Fixed Position */}
+            <motion.div
+              className="sm:hidden fixed bottom-6 right-6 z-10 shadow-lg"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, type: "spring" }}
+            >
+              <Button
+                onClick={handleAddJob}
+                size="icon"
+                className="h-14 w-14 rounded-full"
+              >
+                <Plus className="h-6 w-6" />
+                <span className="sr-only">Add Job</span>
+              </Button>
+            </motion.div>
+          </motion.div>
+          
+          <motion.p 
+            className="text-sm text-muted-foreground -mt-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'} found
+          </motion.p>
+
+          {/* Search and Filters - Responsive Design */}
+          <motion.div 
+            className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <motion.div 
+              className="relative flex-grow max-w-full sm:max-w-[300px]"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search jobs..."
+                className="pl-8 w-full transition-all duration-300 focus:ring-2 focus:ring-primary/50"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </motion.div>
+
+            <motion.div 
+              className="relative flex items-center"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Select
+                value={statusFilter}
+                onValueChange={handleFilterChange}
+              >
+                <SelectTrigger className="w-full sm:w-[160px]">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Filter by status" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="applied">Applied</SelectItem>
+                  <SelectItem value="interview">Interview</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                  <SelectItem value="offer">Offer</SelectItem>
+                  <SelectItem value="accepted">Accepted</SelectItem>
+                </SelectContent>
+              </Select>
+            </motion.div>
+            
+            {/* Desktop Export Button */}
+            <motion.div
+              className="hidden sm:block"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button
+                variant="outline"
+                onClick={() => setExportDialogOpen(true)}
+                className="flex items-center gap-1"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Export</span>
               </Button>
             </motion.div>
           </motion.div>
