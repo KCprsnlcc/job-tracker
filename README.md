@@ -13,6 +13,13 @@ A modern web application built with React, TypeScript, and Supabase to help user
 |:-------------------------:|:-------------------:|
 | ![Job Tracking](./public/image2.png) | ![Task Management](./public/image1.png) |
 
+
+### Mobile View
+
+<p align="center"> <strong> Mobile Experience </strong></p>
+
+![Job Tracker Mobile View](./public/image3.png)
+
 ## Features
 
 - **Authentication**
@@ -51,9 +58,10 @@ A modern web application built with React, TypeScript, and Supabase to help user
   - Modal forms and popovers for interactive content
   - Status indicators with color coding
   - Beautiful and accessible UI components
-
-- **Privacy and Support**
+  
+- **Privacy, Terms, and Support**
   - Detailed Privacy Policy page with comprehensive information on data handling and user rights
+  - Terms of Service page outlining user responsibilities and application usage policies
   - Contact page with form submission functionality for user inquiries and support
   - FAQ section addressing common questions about the application
   - Clear information about the application's free usage with no subscription plans
@@ -111,3 +119,7 @@ The application will be available at http://localhost:3000
 - `npm start`: Run the app in development mode
 - `npm test`: Launch the test runner
 - `npm run build`: Build the app for production
+
+## License
+
+This project is licensed under the terms outlined in the [License](LICENSE.md).

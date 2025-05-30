@@ -792,27 +792,36 @@ const Dashboard: React.FC = () => {
         </motion.div>
 
         <AnimatePresence mode="wait">
-          {loading ? (
+          <motion.div
+            key="table"
+            initial={{ opacity: 0, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            variants={itemVariants}
+            className="relative"
+          >
             <motion.div 
-              className="relative mt-8 bg-card hover:shadow-md transition-all duration-300 border-primary/10 rounded-md overflow-hidden"
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              className="mt-8 bg-card hover:shadow-md transition-all duration-300 border-primary/10 rounded-md overflow-hidden"
+              variants={itemVariants}
             >
               <JobTable
-                jobs={[]}
+                jobs={sortedJobs}
                 onEdit={handleEditJob}
                 onDelete={handleDeleteJob}
                 sortField={sortField}
                 sortDirection={sortDirection}
                 onSort={handleSort}
               />
+            </motion.div>
+            
+            {/* Loading overlay that doesn't prevent the table from rendering */}
+            {loading && (
               <motion.div 
                 className="absolute inset-0 flex items-center justify-center bg-background/80"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
                 <motion.div 
@@ -821,31 +830,8 @@ const Dashboard: React.FC = () => {
                   transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                 ></motion.div>
               </motion.div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="table"
-              initial={{ opacity: 0, y: 0 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              variants={itemVariants}
-            >
-              <motion.div 
-                className="mt-8 bg-card hover:shadow-md transition-all duration-300 border-primary/10 rounded-md overflow-hidden"
-                variants={itemVariants}
-              >
-                <JobTable
-                  jobs={sortedJobs}
-                  onEdit={handleEditJob}
-                  onDelete={handleDeleteJob}
-                  sortField={sortField}
-                  sortDirection={sortDirection}
-                  onSort={handleSort}
-                />
-              </motion.div>
-            </motion.div>
-          )}
+            )}
+          </motion.div>
         </AnimatePresence>
       </motion.main>
 
