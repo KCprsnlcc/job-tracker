@@ -388,29 +388,7 @@ const Dashboard: React.FC = () => {
               Your Job Applications
             </motion.h2>
             
-            {/* Desktop Add Job Button */}
-            <motion.div
-              className="hidden sm:block"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Button
-                onClick={handleAddJob}
-                className="flex items-center gap-1 relative overflow-hidden"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Add Job</span>
-                <motion.div 
-                  className="absolute inset-0 bg-white/20" 
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                />
-              </Button>
-            </motion.div>
+
             
             {/* Mobile Add Button - Fixed Position */}
             <motion.div
@@ -441,7 +419,7 @@ const Dashboard: React.FC = () => {
 
           {/* Search and Filters - Responsive Design */}
           <motion.div 
-            className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full"
+            className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full items-center relative"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -487,7 +465,7 @@ const Dashboard: React.FC = () => {
               </Select>
             </motion.div>
             
-            {/* Desktop Export Button */}
+            {/* Export Button */}
             <motion.div
               className="hidden sm:block"
               whileHover={{ scale: 1.05 }}
@@ -499,9 +477,34 @@ const Dashboard: React.FC = () => {
                 className="flex items-center gap-1"
               >
                 <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Export</span>
+                <span>Export</span>
               </Button>
             </motion.div>
+
+            {/* Add Job Button - Absolute Right Edge */}
+            <motion.div
+              className="hidden sm:block absolute right-0"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Button
+                onClick={handleAddJob}
+                className="flex items-center gap-1 relative overflow-hidden"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add Job</span>
+                <motion.div 
+                  className="absolute inset-0 bg-white/20" 
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                />
+              </Button>
+            </motion.div>
+
           </motion.div>
         </motion.div>
 
@@ -706,26 +709,41 @@ const Dashboard: React.FC = () => {
         <AnimatePresence mode="wait">
           {loading ? (
             <motion.div 
-              className="flex justify-center py-12"
+              className="relative mt-8 bg-card hover:shadow-md transition-all duration-300 border-primary/10 rounded-md overflow-hidden"
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
             >
+              <JobTable
+                jobs={[]}
+                onEdit={handleEditJob}
+                onDelete={handleDeleteJob}
+                sortField={sortField}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+              />
               <motion.div 
-                className="rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              ></motion.div>
+                className="absolute inset-0 flex items-center justify-center bg-background/80"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                <motion.div 
+                  className="rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                ></motion.div>
+              </motion.div>
             </motion.div>
           ) : (
             <motion.div
               key="table"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.3 }}
               variants={itemVariants}
             >
               <motion.div 

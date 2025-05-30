@@ -250,7 +250,7 @@ const TaskManager: React.FC = () => {
                 transition={{ duration: 2, repeat: 0, ease: "easeInOut" }}
               />
               <span className="hidden sm:inline">Job Tracker</span>
-              <span className="sm:hidden">JT</span>
+              <span className="sm:hidden">Job Tracker</span>
             </Link>
           </motion.h1>
           
@@ -370,29 +370,7 @@ const TaskManager: React.FC = () => {
               Your Tasks
             </motion.h2>
             
-            {/* Desktop Add Task Button */}
-            <motion.div
-              className="hidden sm:block"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Button
-                onClick={handleAddTask}
-                className="flex items-center gap-1 relative overflow-hidden"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Add Task</span>
-                <motion.div 
-                  className="absolute inset-0 bg-white/20" 
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                />
-              </Button>
-            </motion.div>
+
             
             {/* Mobile Add Button - Fixed Position */}
             <motion.div
@@ -423,7 +401,7 @@ const TaskManager: React.FC = () => {
 
           {/* Search and Filters - Responsive Design */}
           <motion.div 
-            className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full"
+            className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full relative"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -490,6 +468,30 @@ const TaskManager: React.FC = () => {
                   <SelectItem value="title">Title</SelectItem>
                 </SelectContent>
               </Select>
+            </motion.div>
+            
+            {/* Add Task Button - Absolute Right Edge */}
+            <motion.div
+              className="hidden sm:block absolute right-0"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Button
+                onClick={handleAddTask}
+                className="flex items-center gap-1 relative overflow-hidden"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add Task</span>
+                <motion.div 
+                  className="absolute inset-0 bg-white/20" 
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                />
+              </Button>
             </motion.div>
           </motion.div>
         </motion.div>
