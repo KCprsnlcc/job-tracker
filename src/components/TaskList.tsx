@@ -91,11 +91,11 @@ const TaskList: React.FC<TaskListProps> = ({
     const lowerPriority = priority.toLowerCase();
     switch (lowerPriority) {
       case 'high':
-        return 'bg-destructive/10 text-destructive border-destructive/20';
+        return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-800 font-semibold';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-500';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-300 dark:border-yellow-800 font-medium';
       case 'low':
-        return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-500';
+        return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-800';
       default:
         return 'bg-secondary text-secondary-foreground';
     }
@@ -186,7 +186,8 @@ const TaskList: React.FC<TaskListProps> = ({
                   </TableCell>
                 )}
                 <TableCell>
-                  <Badge variant="outline" className={getPriorityColor(task.priority)}>
+                  <Badge variant="outline" className={`${getPriorityColor(task.priority)} flex items-center justify-center gap-1 px-2 py-0.5 text-xs max-w-[80px]`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${task.priority.toLowerCase() === 'high' ? 'bg-red-500 dark:bg-red-400' : task.priority.toLowerCase() === 'medium' ? 'bg-yellow-500 dark:bg-yellow-400' : 'bg-green-500 dark:bg-green-400'}`}></span>
                     {task.priority}
                   </Badge>
                 </TableCell>

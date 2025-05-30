@@ -212,6 +212,122 @@ export const exportToXML = async (userId: string, options: ExportOptions): Promi
   return xml;
 };
 
+// Export to PDF format
+export const exportToPDF = async (userId: string, options: ExportOptions): Promise<string> => {
+  const jobs = await getFilteredJobs(userId, options.filters);
+  
+  // Include tasks if requested
+  let tasksByJobId: { [jobId: string]: Task[] } = {};
+  if (options.filters.includeTasks && jobs.length > 0) {
+    const jobIds = jobs.map(job => job.id).filter((id): id is string => id !== undefined);
+    tasksByJobId = await getJobTasks(jobIds);
+  }
+  
+  // Generate HTML content that could be converted to PDF
+  let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Job Applications Export</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .task-table { margin-left: 20px; margin-top: 10px; margin-bottom: 20px; }
+        .job-notes { white-space: pre-wrap; margin-top: 10px; }
+      </style>
+    </head>
+    <body>
+      <h1>Job Applications Export</h1>
+      <p>Generated on: ${new Date().toLocaleDateString()}</p>
+  `;
+  
+  // Add jobs table
+  html += `
+    <table>
+      <tr>
+        <th>Company</th>
+        <th>Role</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th>Date Applied</th>
+        <th>URL</th>
+      </tr>
+  `;
+  
+  jobs.forEach(job => {
+    html += `
+      <tr>
+        <td>${job.company}</td>
+        <td>${job.role}</td>
+        <td>${job.location}</td>
+        <td>${job.status}</td>
+        <td>${formatDate(job.date_applied)}</td>
+        <td>${job.link || ''}</td>
+      </tr>
+    `;
+    
+    // Add notes if requested
+    if (options.filters.includeNotes && job.notes) {
+      html += `
+        <tr>
+          <td colspan="6">
+            <div class="job-notes">
+              <strong>Notes:</strong><br>
+              ${job.notes.replace(/\n/g, '<br>')}
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+    
+    // Add tasks if requested
+    if (options.filters.includeTasks && typeof job.id === 'string' && tasksByJobId[job.id] && tasksByJobId[job.id].length > 0) {
+      html += `
+        <tr>
+          <td colspan="6">
+            <strong>Tasks:</strong>
+            <table class="task-table">
+              <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Priority</th>
+              </tr>
+      `;
+      
+      tasksByJobId[job.id].forEach(task => {
+        html += `
+          <tr>
+            <td>${task.title}</td>
+            <td>${task.description || ''}</td>
+            <td>${task.due_date ? formatDate(task.due_date) : ''}</td>
+            <td>${task.completed ? 'Completed' : 'Pending'}</td>
+            <td>${task.priority}</td>
+          </tr>
+        `;
+      });
+      
+      html += `
+            </table>
+          </td>
+        </tr>
+      `;
+    }
+  });
+  
+  html += `
+    </table>
+    </body>
+    </html>
+  `;
+  
+  return html;
+};
+
 // Helper function to escape XML special characters
 function escapeXml(unsafe: string): string {
   return unsafe
@@ -296,8 +412,7 @@ export const exportData = async (userId: string, options: ExportOptions): Promis
     case 'xml':
       return exportToXML(userId, options);
     case 'pdf':
-      // PDF export would typically be handled by a dedicated library
-      throw new Error('PDF export is not implemented yet');
+      return exportToPDF(userId, options);
     default:
       throw new Error(`Unsupported export format: ${options.format}`);
   }
