@@ -14,7 +14,7 @@ A modern web application built with React, TypeScript, and Supabase to help user
 | ![Job Tracking](./public/image2.png) | ![Task Management](./public/image1.png) |
 
 
-### Mobile View
+## Mobile View
 
 <p align="center"> <strong> Mobile Experience </strong></p>
 
