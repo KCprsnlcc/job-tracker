@@ -6,9 +6,9 @@ import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { LogOut, CheckSquare, Plus, Clock, Filter, Check, ArrowLeft, AlertCircle, Search } from 'lucide-react';
+import { LogOut, CheckSquare, Plus, Clock, Filter, Check, ArrowLeft, AlertCircle, Search, Menu, X, ArrowRight, BarChart2, ArrowUpDown } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
@@ -21,6 +21,15 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { Input } from '../components/ui/input';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from '../components/ui/sheet';
 
 const TaskManager: React.FC = () => {
   // For scroll-based animations
@@ -55,6 +64,8 @@ const TaskManager: React.FC = () => {
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [filterType, setFilterType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState<string>('due_date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     if (user) {
@@ -112,6 +123,15 @@ const TaskManager: React.FC = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
   const filteredTasks = tasks.filter(task => {
     // Search filtering
     const searchLower = searchTerm.toLowerCase();
@@ -150,6 +170,55 @@ const TaskManager: React.FC = () => {
     
     return true;
   });
+
+  // Sort the filtered tasks
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    if (sortField === 'due_date') {
+      const dateA = new Date(a.due_date).getTime();
+      const dateB = new Date(b.due_date).getTime();
+      return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+    } else if (sortField === 'priority') {
+      const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+      const valueA = priorityOrder[a.priority.toLowerCase() as keyof typeof priorityOrder] || 0;
+      const valueB = priorityOrder[b.priority.toLowerCase() as keyof typeof priorityOrder] || 0;
+      return sortDirection === 'asc' ? valueA - valueB : valueB - valueA;
+    } else if (sortField === 'title') {
+      const valueA = a.title.toLowerCase();
+      const valueB = b.title.toLowerCase();
+      if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+      if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    } else {
+      return 0;
+    }
+  });
+
+  // Mobile menu items for side drawer
+  const MobileMenuItem = ({ icon, label, onClick, to, highlight = false }: any) => (
+    <motion.div
+      whileHover={{ x: 5 }}
+      whileTap={{ scale: 0.95 }}
+      className="w-full"
+    >
+      {to ? (
+        <Link
+          to={to}
+          className={`flex items-center gap-3 py-3 px-4 rounded-md hover:bg-muted ${highlight ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}`}
+        >
+          {icon}
+          <span>{label}</span>
+        </Link>
+      ) : (
+        <button
+          onClick={onClick}
+          className={`flex items-center gap-3 py-3 px-4 rounded-md hover:bg-muted w-full text-left ${highlight ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}`}
+        >
+          {icon}
+          <span>{label}</span>
+        </button>
+      )}
+    </motion.div>
+  );
 
   return (
     <motion.div 
@@ -204,7 +273,10 @@ const TaskManager: React.FC = () => {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => signOut()}
+                onClick={() => {
+                  console.log('TaskManager: Sign out button clicked');
+                  signOut();
+                }}
                 className="flex items-center gap-1 relative overflow-hidden"
               >
                 <LogOut className="h-4 w-4" />
@@ -219,137 +291,97 @@ const TaskManager: React.FC = () => {
             </motion.div>
           </motion.div>
           
-          {/* Mobile Navigation */}
+          {/* Mobile Menu Button */}
           <motion.div 
-            className="md:hidden flex items-center space-x-2"
+            className="md:hidden flex items-center gap-2"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <ThemeToggle />
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => signOut()}
-                className="relative overflow-hidden"
-              >
-                <LogOut className="h-4 w-4" />
-                <motion.div 
-                  className="absolute inset-0 bg-primary/10" 
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                />
-              </Button>
-            </motion.div>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[80vw] max-w-sm">
+                <SheetHeader className="mb-6">
+                  <SheetTitle className="flex items-center gap-2">
+                    <img src="/favicon.ico" alt="Job Tracker" className="w-6 h-6" />
+                    Job Tracker
+                  </SheetTitle>
+                  <SheetDescription className="text-sm">
+                    {user?.email}
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="flex flex-col gap-1">
+                  <MobileMenuItem 
+                    icon={<BarChart2 className="h-4 w-4" />} 
+                    label="Analytics" 
+                    to="/analytics" 
+                  />
+                  <MobileMenuItem 
+                    icon={<Plus className="h-4 w-4" />} 
+                    label="Add Task" 
+                    onClick={() => {
+                      handleAddTask();
+                      // Close the sheet
+                      (document.querySelector('[data-radix-collection-item]') as HTMLElement)?.click();
+                    }}
+                    highlight
+                  />
+                  <MobileMenuItem 
+                    icon={<CheckSquare className="h-4 w-4" />} 
+                    label="Dashboard" 
+                    to="/dashboard" 
+                  />
+                  <div className="my-2 border-t border-border"></div>
+                  <MobileMenuItem 
+                    icon={<LogOut className="h-4 w-4" />} 
+                    label="Sign Out" 
+                    onClick={signOut}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
           </motion.div>
         </div>
       </motion.header>
 
       <motion.main 
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
         <motion.div 
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0"
+          className="flex flex-col mb-6 space-y-4"
           variants={itemVariants}
         >
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
+          <motion.div className="flex justify-between items-center">
             <motion.h2 
-              className="text-xl font-semibold flex items-center gap-2"
-              whileHover={{ x: 5 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="text-xl font-semibold"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1, rotate: 360 }}
-                transition={{ duration: 0.5 }}
-              >
-                <CheckSquare className="h-5 w-5 text-primary" />
-              </motion.div>
-              Task Management
+              Your Tasks
             </motion.h2>
-            <motion.p 
-              className="text-sm text-muted-foreground mt-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              Keep track of your job search tasks and follow-ups
-            </motion.p>
-          </motion.div>
-
-          <motion.div 
-            className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <motion.div 
-              className="relative"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search tasks..."
-                className="pl-8 w-full sm:w-[200px] lg:w-[300px] transition-all duration-300 focus:ring-2 focus:ring-primary/50"
-                value={searchTerm}
-                onChange={handleSearch}
-              />
-            </motion.div>
-
-            <motion.div 
-              className="relative flex items-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select
-                value={filterType}
-                onValueChange={handleFilterChange}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter tasks" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Tasks</SelectItem>
-                  <SelectItem value="pending">Pending Tasks</SelectItem>
-                  <SelectItem value="completed">Completed Tasks</SelectItem>
-                  <SelectItem value="today">Due Today</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
-                  <SelectItem value="upcoming">Next 7 Days</SelectItem>
-                </SelectContent>
-              </Select>
-            </motion.div>
             
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="outline" asChild className="relative overflow-hidden">
-                <Link to="/dashboard" className="flex items-center gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Dashboard
-                  <motion.div 
-                    className="absolute inset-0 bg-primary/10" 
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: "100%" }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                  />
-                </Link>
-              </Button>
-            </motion.div>
-
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            {/* Desktop Add Task Button */}
+            <motion.div
+              className="hidden sm:block"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
               <Button
                 onClick={handleAddTask}
-                className="flex items-center gap-2 relative overflow-hidden"
+                className="flex items-center gap-1 relative overflow-hidden"
               >
                 <Plus className="h-4 w-4" />
                 <span>Add Task</span>
@@ -360,6 +392,104 @@ const TaskManager: React.FC = () => {
                   transition={{ duration: 0.8, ease: "easeInOut" }}
                 />
               </Button>
+            </motion.div>
+            
+            {/* Mobile Add Button - Fixed Position */}
+            <motion.div
+              className="sm:hidden fixed bottom-6 right-6 z-10 shadow-lg"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, type: "spring" }}
+            >
+              <Button
+                onClick={handleAddTask}
+                size="icon"
+                className="h-14 w-14 rounded-full"
+              >
+                <Plus className="h-6 w-6" />
+                <span className="sr-only">Add Task</span>
+              </Button>
+            </motion.div>
+          </motion.div>
+          
+          <motion.p 
+            className="text-sm text-muted-foreground -mt-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            {sortedTasks.length} {sortedTasks.length === 1 ? 'task' : 'tasks'} found
+          </motion.p>
+
+          {/* Search and Filters - Responsive Design */}
+          <motion.div 
+            className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <motion.div 
+              className="relative flex-grow max-w-full sm:max-w-[300px]"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search tasks..."
+                className="pl-8 w-full transition-all duration-300 focus:ring-2 focus:ring-primary/50"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </motion.div>
+
+            <motion.div 
+              className="relative flex items-center"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Select
+                value={filterType}
+                onValueChange={handleFilterChange}
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Filter tasks" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Tasks</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="today">Due Today</SelectItem>
+                  <SelectItem value="overdue">Overdue</SelectItem>
+                  <SelectItem value="upcoming">Upcoming (7 days)</SelectItem>
+                </SelectContent>
+              </Select>
+            </motion.div>
+            
+            <motion.div 
+              className="relative flex items-center"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Select
+                value={sortField}
+                onValueChange={(value) => handleSort(value)}
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <div className="flex items-center gap-2">
+                    <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Sort by" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="due_date">Due Date</SelectItem>
+                  <SelectItem value="priority">Priority</SelectItem>
+                  <SelectItem value="title">Title</SelectItem>
+                </SelectContent>
+              </Select>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -377,12 +507,10 @@ const TaskManager: React.FC = () => {
                   <motion.div 
                     className="flex-shrink-0"
                     initial={{ scale: 0 }}
-                    animate={{ scale: 1, rotate: 360 }}
+                    animate={{ scale: 1, rotate: [0, 0, 360] }}
                     transition={{ duration: 0.5 }}
                   >
-                    <svg className="h-5 w-5 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <AlertCircle className="h-5 w-5 text-destructive" />
                   </motion.div>
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-destructive">Error</h3>
@@ -394,152 +522,61 @@ const TaskManager: React.FC = () => {
           )}
         </AnimatePresence>
 
-        <motion.div
-          variants={itemVariants}
-          layoutId="tabs-container"
-        >
-          <Tabs defaultValue={filterType} value={filterType} className="mb-6">
-            <TabsList>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                layout
-              >
-                <TabsTrigger value="all" className="flex items-center gap-1" onClick={() => setFilterType('all')}>
-                  <motion.div whileHover={{ rotate: 15 }} layout>
-                    <CheckSquare className="h-4 w-4" />
-                  </motion.div>
-                  All Tasks
-                </TabsTrigger>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                layout
-              >
-                <TabsTrigger value="today" className="flex items-center gap-1" onClick={() => setFilterType('today')}>
-                  <motion.div whileHover={{ rotate: 15 }} layout>
-                    <Clock className="h-4 w-4" />
-                  </motion.div>
-                  Due Today
-                </TabsTrigger>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                layout
-              >
-                <TabsTrigger value="overdue" className="flex items-center gap-1" onClick={() => setFilterType('overdue')}>
-                  <motion.div whileHover={{ rotate: 15 }} layout>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </motion.div>
-                  Overdue
-                </TabsTrigger>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                layout
-              >
-                <TabsTrigger value="completed" className="flex items-center gap-1" onClick={() => setFilterType('completed')}>
-                  <motion.div whileHover={{ rotate: 15 }} layout>
-                    <Check className="h-4 w-4" />
-                  </motion.div>
-                  Completed
-                </TabsTrigger>
-              </motion.div>
-            </TabsList>
-          </Tabs>
-        </motion.div>
-        
-
-
+        {/* Task List */}
         <motion.div 
-          className="mt-6"
           variants={itemVariants}
+          className="mb-16"
         >
-          <Card className="overflow-hidden hover:shadow-md transition-all duration-300 border-primary/10">
-            <CardContent className="p-4 sm:p-6">
-              {filteredTasks.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="mx-auto h-12 w-12 text-muted-foreground">
-                    <svg
-                      className="h-12 w-12"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="mt-2 text-sm font-medium">No tasks found</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {filterType === 'all' 
-                      ? 'Get started by creating a new task.' 
-                      : 'Try changing your filters to see more tasks.'}
-                  </p>
-                </div>
-              ) : (
-                <TaskList 
-                  tasks={filteredTasks} 
-                  onEdit={handleEditTask} 
-                  onRefresh={fetchTasks}
-                  showJobInfo={true}
-                  loading={loading}
-                />
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <AnimatePresence mode="wait">
           {loading ? (
-            <motion.div 
-              className="flex justify-center py-12"
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <motion.div 
-                className="rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              ></motion.div>
-            </motion.div>
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          ) : sortedTasks.length === 0 ? (
+            <Card className="bg-card hover:shadow-md transition-all duration-300 border-primary/10 overflow-hidden">
+              <div className="text-center py-12">
+                <div className="mx-auto h-12 w-12 text-muted-foreground">
+                  <CheckSquare className="h-12 w-12" />
+                </div>
+                <h3 className="mt-2 text-sm font-medium">No tasks found</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {searchTerm || filterType !== 'all' ? 'Try changing your filters or adding a new task.' : 'Get started by adding a new task.'}
+                </p>
+                <Button
+                  onClick={handleAddTask}
+                  className="mt-6 flex items-center gap-1 relative overflow-hidden mx-auto"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Add Task</span>
+                </Button>
+              </div>
+            </Card>
           ) : (
-            <motion.div
-              key="tasklist"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              variants={itemVariants}
-            >
-            </motion.div>
+            <TaskList 
+              tasks={sortedTasks}
+              onEdit={handleEditTask}
+              onRefresh={fetchTasks}
+              showJobInfo={true}
+              loading={loading}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+            />
           )}
-        </AnimatePresence>
-
-
+        </motion.div>
       </motion.main>
 
-      <TaskForm
-        isOpen={isFormOpen}
-        onClose={handleFormClose}
-        task={currentTask}
-        onSuccess={handleFormSuccess}
-      />
-      
       <Footer />
+
+      <AnimatePresence>
+        {isFormOpen && (
+          <TaskForm
+            isOpen={isFormOpen}
+            onClose={handleFormClose}
+            onSuccess={handleFormSuccess}
+            task={currentTask}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

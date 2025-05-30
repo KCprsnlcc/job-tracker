@@ -5,12 +5,21 @@ import { AnalyticsData } from '../types';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { LogOut, BarChart2, RefreshCw, ArrowLeft } from 'lucide-react';
+import { LogOut, BarChart2, RefreshCw, ArrowLeft, Menu, X, CheckSquare, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from '../components/ui/sheet';
 
 const Analytics: React.FC = () => {
   // For scroll-based animations
@@ -152,22 +161,49 @@ const Analytics: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <ThemeToggle />
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => signOut()}
-                className="relative overflow-hidden"
-              >
-                <LogOut className="h-4 w-4" />
-                <motion.div 
-                  className="absolute inset-0 bg-primary/10" 
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                />
-              </Button>
-            </motion.div>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[80vw] max-w-sm">
+                <SheetHeader className="mb-6">
+                  <SheetTitle className="flex items-center gap-2">
+                    <img src="/favicon.ico" alt="Job Tracker" className="w-6 h-6" />
+                    Job Tracker
+                  </SheetTitle>
+                  <SheetDescription className="text-sm">
+                    {user?.email}
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="flex flex-col gap-1">
+                  <Link 
+                    to="/dashboard" 
+                    className="flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                  <Link 
+                    to="/tasks" 
+                    className="flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors"
+                  >
+                    <CheckSquare className="h-4 w-4" />
+                    <span>Tasks</span>
+                  </Link>
+                  <div className="my-2 border-t border-border"></div>
+                  <button 
+                    className="flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors w-full text-left"
+                    onClick={signOut}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </motion.div>
         </div>
       </motion.header>

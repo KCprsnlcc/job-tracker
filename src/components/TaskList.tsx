@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Task } from '../types';
 import { completeTask, deleteTask } from '../services/taskService';
 import { format } from 'date-fns';
-import { Check, Edit, Trash, AlertCircle } from 'lucide-react';
+import { Check, Edit, Trash, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import {
@@ -26,6 +26,9 @@ interface TaskListProps {
   onRefresh: () => void;
   showJobInfo?: boolean;
   loading?: boolean;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+  onSort?: (field: string) => void;
 }
 
 const TaskList: React.FC<TaskListProps> = ({
@@ -34,6 +37,9 @@ const TaskList: React.FC<TaskListProps> = ({
   onRefresh,
   showJobInfo = false,
   loading = false,
+  sortField = 'due_date',
+  sortDirection = 'asc',
+  onSort = () => {},
 }) => {
   const { toast } = useToast();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -129,6 +135,19 @@ const TaskList: React.FC<TaskListProps> = ({
     return '';
   };
   
+  // Render sort icon based on current sort state
+  const renderSortIcon = (field: string) => {
+    if (sortField !== field) {
+      return <ChevronDown className="w-3 h-3 ml-1 text-muted-foreground opacity-50" />;
+    }
+    
+    return sortDirection === 'asc' ? (
+      <ChevronUp className="w-3 h-3 ml-1 text-foreground" />
+    ) : (
+      <ChevronDown className="w-3 h-3 ml-1 text-foreground" />
+    );
+  };
+  
   // Render task cards for mobile view
   const renderMobileTaskCards = () => {
     return tasks.map((task, index) => (
@@ -221,17 +240,41 @@ const TaskList: React.FC<TaskListProps> = ({
   }
 
   return (
-    <>
+    <Card className="bg-card hover:shadow-md transition-all duration-300 border-primary/10 overflow-hidden">
       {/* Desktop Table View - Hidden on Mobile */}
-      <div className="hidden md:block rounded-md border">
+      <div className="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-12"></TableHead>
-              <TableHead>Task</TableHead>
+              <TableHead 
+                className="cursor-pointer"
+                onClick={() => onSort('title')}
+              >
+                <div className="flex items-center">
+                  Task
+                  {renderSortIcon('title')}
+                </div>
+              </TableHead>
               {showJobInfo && <TableHead>Related Job</TableHead>}
-              <TableHead>Priority</TableHead>
-              <TableHead>Due Date</TableHead>
+              <TableHead 
+                className="cursor-pointer"
+                onClick={() => onSort('priority')}
+              >
+                <div className="flex items-center">
+                  Priority
+                  {renderSortIcon('priority')}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer"
+                onClick={() => onSort('due_date')}
+              >
+                <div className="flex items-center">
+                  Due Date
+                  {renderSortIcon('due_date')}
+                </div>
+              </TableHead>
               <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -307,13 +350,22 @@ const TaskList: React.FC<TaskListProps> = ({
       </div>
       
       {/* Mobile Card View - Shown only on Mobile */}
-      <div className="md:hidden">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium">Tasks</h2>
+      <div className="md:hidden p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-medium">Tasks</h2>
+          <div className="flex items-center space-x-2 text-sm">
+            <button 
+              onClick={() => onSort('due_date')} 
+              className="flex items-center text-muted-foreground"
+            >
+              <span>Sort by Date</span>
+              {sortField === 'due_date' && (
+                sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />
+              )}
+            </button>
           </div>
-          {renderMobileTaskCards()}
         </div>
+        {renderMobileTaskCards()}
       </div>
 
       <DeleteConfirmation
@@ -323,7 +375,7 @@ const TaskList: React.FC<TaskListProps> = ({
         title="Delete Task"
         description="Are you sure you want to delete this task? This action cannot be undone."
       />
-    </>
+    </Card>
   );
 };
 
