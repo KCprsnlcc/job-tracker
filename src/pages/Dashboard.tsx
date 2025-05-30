@@ -8,7 +8,7 @@ import DeleteConfirmation from '../components/DeleteConfirmation';
 import ExportDialog from '../components/ExportDialog';
 import Footer from '../components/Footer';
 import { ThemeToggle } from '../components/theme-toggle';
-import { Search, Plus, LogOut, BarChart2, CheckSquare, ArrowRight, Download, Filter, Menu, X } from 'lucide-react';
+import { Search, Plus, LogOut, BarChart2, CheckSquare, ArrowRight, Download, Filter, Menu, X, ArrowUpDown } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
@@ -315,7 +315,7 @@ const Dashboard: React.FC = () => {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[80vw] max-w-sm">
+              <SheetContent side="right" className="w-[90vw] max-w-md">
                 <SheetHeader className="mb-6">
                   <SheetTitle className="flex items-center gap-2">
                     <img src="/favicon.ico" alt="Job Tracker" className="w-6 h-6" />
@@ -325,6 +325,75 @@ const Dashboard: React.FC = () => {
                     {user?.email}
                   </SheetDescription>
                 </SheetHeader>
+                
+                {/* Mobile Search & Filters - Matching Main Dashboard */}
+                <div className="mb-6 space-y-4 border-b border-border pb-6">
+                  <motion.div 
+                    className="relative w-full"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Search jobs..."
+                      className="pl-10 w-full transition-all duration-300 focus:ring-2 focus:ring-primary/50 h-12 text-base"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="relative w-full"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Select
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                    >
+                      <SelectTrigger className="w-full h-12">
+                        <div className="flex items-center gap-2">
+                          <SelectValue placeholder="All Statuses" className="text-base" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="applied">Applied</SelectItem>
+                        <SelectItem value="interview">Interview</SelectItem>
+                        <SelectItem value="offer">Offer</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                        <SelectItem value="no_response">No Response</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="relative w-full"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Select
+                      value={sortField}
+                      onValueChange={(value) => {
+                        setSortField(value as SortField);
+                      }}
+                    >
+                      <SelectTrigger className="w-full h-12">
+                        <div className="flex items-center gap-2">
+                          <SelectValue placeholder="Sort by Date" className="text-base" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="date_applied">Date Applied</SelectItem>
+                        <SelectItem value="company">Company</SelectItem>
+                        <SelectItem value="role">Role</SelectItem>
+                        <SelectItem value="status">Status</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </motion.div>
+                </div>
+                
                 <div className="flex flex-col gap-1">
                   <MobileMenuItem 
                     icon={<BarChart2 className="h-4 w-4" />} 
@@ -378,9 +447,9 @@ const Dashboard: React.FC = () => {
           className="flex flex-col mb-6 space-y-4"
           variants={itemVariants}
         >
-          <motion.div className="flex justify-between items-center">
+          <motion.div className="flex justify-between items-center w-full">
             <motion.h2 
-              className="text-xl font-semibold"
+              className="text-xl font-semibold w-full sm:w-auto"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -409,7 +478,7 @@ const Dashboard: React.FC = () => {
           </motion.div>
           
           <motion.p 
-            className="text-sm text-muted-foreground -mt-2"
+            className="text-sm text-muted-foreground -mt-2 w-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -425,7 +494,7 @@ const Dashboard: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <motion.div 
-              className="relative flex-grow max-w-full sm:max-w-[300px]"
+              className="relative flex-grow w-full sm:max-w-[300px]"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
@@ -440,7 +509,7 @@ const Dashboard: React.FC = () => {
             </motion.div>
 
             <motion.div 
-              className="relative flex items-center"
+              className="relative flex items-center w-full sm:w-auto"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
@@ -478,6 +547,22 @@ const Dashboard: React.FC = () => {
               >
                 <Download className="h-4 w-4" />
                 <span>Export</span>
+              </Button>
+            </motion.div>
+            
+            {/* Mobile Export Button - Full Width */}
+            <motion.div 
+              className="sm:hidden w-full mt-3"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button
+                variant="outline"
+                onClick={() => setExportDialogOpen(true)}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                <span>Export Data</span>
               </Button>
             </motion.div>
 

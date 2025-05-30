@@ -306,7 +306,7 @@ const TaskManager: React.FC = () => {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[80vw] max-w-sm">
+              <SheetContent side="right" className="w-[90vw] max-w-md">
                 <SheetHeader className="mb-6">
                   <SheetTitle className="flex items-center gap-2">
                     <img src="/favicon.ico" alt="Job Tracker" className="w-6 h-6" />
@@ -316,11 +316,84 @@ const TaskManager: React.FC = () => {
                     {user?.email}
                   </SheetDescription>
                 </SheetHeader>
+                
+                {/* Mobile Search & Filters - Matching Main Content */}
+                <div className="mb-6 space-y-4 border-b border-border pb-6">
+                  <motion.div 
+                    className="relative w-full"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Search tasks..."
+                      className="pl-10 w-full transition-all duration-300 focus:ring-2 focus:ring-primary/50 h-12 text-base"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="relative w-full"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Select
+                      value={filterType}
+                      onValueChange={setFilterType}
+                    >
+                      <SelectTrigger className="w-full h-12">
+                        <div className="flex items-center gap-2">
+                          <SelectValue placeholder="All Tasks" className="text-base" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Tasks</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="today">Today</SelectItem>
+                        <SelectItem value="overdue">Overdue</SelectItem>
+                        <SelectItem value="upcoming">Upcoming</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="relative w-full"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Select
+                      value={sortField}
+                      onValueChange={(value) => {
+                        setSortField(value as string);
+                      }}
+                    >
+                      <SelectTrigger className="w-full h-12">
+                        <div className="flex items-center gap-2">
+                          <SelectValue placeholder="Sort by Due Date" className="text-base" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="due_date">Due Date</SelectItem>
+                        <SelectItem value="priority">Priority</SelectItem>
+                        <SelectItem value="title">Title</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </motion.div>
+                </div>
+                
                 <div className="flex flex-col gap-1">
                   <MobileMenuItem 
                     icon={<BarChart2 className="h-4 w-4" />} 
                     label="Analytics" 
                     to="/analytics" 
+                  />
+                  <MobileMenuItem 
+                    icon={<CheckSquare className="h-4 w-4" />} 
+                    label="Dashboard" 
+                    to="/dashboard" 
                   />
                   <MobileMenuItem 
                     icon={<Plus className="h-4 w-4" />} 
@@ -331,11 +404,6 @@ const TaskManager: React.FC = () => {
                       (document.querySelector('[data-radix-collection-item]') as HTMLElement)?.click();
                     }}
                     highlight
-                  />
-                  <MobileMenuItem 
-                    icon={<CheckSquare className="h-4 w-4" />} 
-                    label="Dashboard" 
-                    to="/dashboard" 
                   />
                   <div className="my-2 border-t border-border"></div>
                   <MobileMenuItem 
