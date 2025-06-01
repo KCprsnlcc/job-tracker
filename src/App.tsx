@@ -17,6 +17,7 @@ import Contact from './pages/Contact';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/toaster';
 import NavigationHandler from './components/NavigationHandler';
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import './App.css';
 
 function App() {
@@ -54,6 +55,8 @@ function App() {
           </Routes>
           {/* Toast notifications */}
           <Toaster />
+          {/* Vercel Analytics */}
+          <VercelAnalytics />
         </Router>
       </AuthProvider>
     </ThemeProvider>
