@@ -318,3 +318,197 @@ CREATE POLICY "Users can insert their own settings" ON user_settings
 -- Only authenticated users can update their own settings
 CREATE POLICY "Users can update their own settings" ON user_settings
   FOR UPDATE USING (auth.uid() = user_id);
+
+-- Create user_access_logs table for tracking devices and IP addresses
+CREATE TABLE IF NOT EXISTS user_access_logs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  ip_address TEXT,
+  device_type TEXT,
+  device_name TEXT,
+  browser TEXT,
+  operating_system TEXT,
+  user_agent TEXT,
+  access_timestamp TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Add RLS (Row Level Security) policies for user_access_logs table
+ALTER TABLE user_access_logs ENABLE ROW LEVEL SECURITY;
+
+-- Only authenticated users can view their own access logs
+CREATE POLICY "Users can view their own access logs" ON user_access_logs
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Only authenticated users can insert their own access logs
+CREATE POLICY "Users can insert their own access logs" ON user_access_logs
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Create indexes for user_access_logs table
+CREATE INDEX IF NOT EXISTS user_access_logs_user_id_idx ON user_access_logs (user_id);
+CREATE INDEX IF NOT EXISTS user_access_logs_ip_address_idx ON user_access_logs (ip_address);
+CREATE INDEX IF NOT EXISTS user_access_logs_access_timestamp_idx ON user_access_logs (access_timestamp);
+
+-- Create function to add user access log
+CREATE OR REPLACE FUNCTION add_user_access_log(
+  user_uuid UUID, 
+  ip_addr TEXT,
+  device_tp TEXT,
+  device_nm TEXT,
+  browser_nm TEXT,
+  os_nm TEXT,
+  agent TEXT
+)
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO user_access_logs (
+    user_id, 
+    ip_address, 
+    device_type, 
+    device_name, 
+    browser, 
+    operating_system, 
+    user_agent
+  )
+  VALUES (
+    user_uuid, 
+    ip_addr, 
+    device_tp, 
+    device_nm, 
+    browser_nm, 
+    os_nm, 
+    agent
+  );
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create function to handle auth.users sign-in tracking
+CREATE OR REPLACE FUNCTION handle_auth_user_signin()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- When a user signs in, their metadata is updated
+  IF OLD.last_sign_in_at IS DISTINCT FROM NEW.last_sign_in_at THEN
+    -- Extract device info from user metadata if available
+    INSERT INTO user_access_logs (
+      user_id,
+      ip_address,
+      device_type,
+      device_name,
+      browser,
+      operating_system,
+      user_agent
+    )
+    VALUES (
+      NEW.id,
+      NEW.raw_app_meta_data->>'ip'::TEXT,
+      NEW.raw_user_meta_data->>'device_type'::TEXT,
+      NEW.raw_user_meta_data->>'device_name'::TEXT,
+      NEW.raw_user_meta_data->>'browser'::TEXT,
+      NEW.raw_user_meta_data->>'os'::TEXT,
+      NEW.raw_user_meta_data->>'user_agent'::TEXT
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger on auth.users table to track sign-ins
+DROP TRIGGER IF EXISTS user_signin_tracking_trigger ON auth.users;
+CREATE TRIGGER user_signin_tracking_trigger
+AFTER UPDATE ON auth.users
+FOR EACH ROW
+EXECUTE FUNCTION handle_auth_user_signin();
+
+-- Create admin policy for viewing all access logs (for security monitoring)
+CREATE POLICY "Admins can view all access logs" ON user_access_logs
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM auth.users
+      WHERE auth.uid() = auth.users.id AND auth.users.is_super_admin = true
+    )
+  );
+
+-- Create suspicious_logins table for tracking potential security concerns
+CREATE TABLE IF NOT EXISTS suspicious_logins (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  access_log_id UUID NOT NULL REFERENCES user_access_logs(id) ON DELETE CASCADE,
+  reason TEXT NOT NULL,
+  severity TEXT NOT NULL CHECK (severity IN ('Low', 'Medium', 'High')),
+  reviewed BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Add RLS (Row Level Security) policies for suspicious_logins table
+ALTER TABLE suspicious_logins ENABLE ROW LEVEL SECURITY;
+
+-- Only admins can view suspicious logins
+CREATE POLICY "Admins can view suspicious logins" ON suspicious_logins
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM auth.users
+      WHERE auth.uid() = auth.users.id AND auth.users.is_super_admin = true
+    )
+  );
+
+-- Create function to detect suspicious logins
+CREATE OR REPLACE FUNCTION detect_suspicious_login()
+RETURNS TRIGGER AS $$
+DECLARE
+  common_ip BOOLEAN;
+  common_device BOOLEAN;
+  new_country TEXT;
+  prev_country TEXT;
+  reason_text TEXT;
+  severity_level TEXT;
+BEGIN
+  -- Check if this IP has been used before by this user
+  SELECT EXISTS (
+    SELECT 1 FROM user_access_logs 
+    WHERE user_id = NEW.user_id 
+    AND ip_address = NEW.ip_address
+    AND id != NEW.id
+  ) INTO common_ip;
+  
+  -- Check if this device has been used before by this user
+  SELECT EXISTS (
+    SELECT 1 FROM user_access_logs 
+    WHERE user_id = NEW.user_id 
+    AND device_name = NEW.device_name
+    AND browser = NEW.browser
+    AND operating_system = NEW.operating_system
+    AND id != NEW.id
+  ) INTO common_device;
+  
+  -- If neither the IP nor device has been seen before, flag as suspicious
+  IF NOT common_ip AND NOT common_device THEN
+    reason_text := 'New IP address and new device detected';
+    severity_level := 'Medium';
+    
+    INSERT INTO suspicious_logins (user_id, access_log_id, reason, severity)
+    VALUES (NEW.user_id, NEW.id, reason_text, severity_level);
+  -- If just the IP is new, flag as low severity suspicious
+  ELSIF NOT common_ip AND common_device THEN
+    reason_text := 'New IP address detected';
+    severity_level := 'Low';
+    
+    INSERT INTO suspicious_logins (user_id, access_log_id, reason, severity)
+    VALUES (NEW.user_id, NEW.id, reason_text, severity_level);
+  -- If just the device is new, flag as low severity suspicious
+  ELSIF common_ip AND NOT common_device THEN
+    reason_text := 'New device detected';
+    severity_level := 'Low';
+    
+    INSERT INTO suspicious_logins (user_id, access_log_id, reason, severity)
+    VALUES (NEW.user_id, NEW.id, reason_text, severity_level);
+  END IF;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger to detect suspicious logins
+DROP TRIGGER IF EXISTS detect_suspicious_login_trigger ON user_access_logs;
+CREATE TRIGGER detect_suspicious_login_trigger
+AFTER INSERT ON user_access_logs
+FOR EACH ROW
+EXECUTE FUNCTION detect_suspicious_login();
